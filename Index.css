@@ -1,0 +1,68 @@
+:root {
+  --color-principal-orange: #ffb730;  
+  --color-secundario-orange: #db991e;
+
+  --color-principal-yellow: #ffce0a;
+  --color-principal-red: #ec0911;
+
+}
+
+body {
+  margin: 0;
+  height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la ventana */
+  background-image: url('placeholder.PNG'); /* Coloca la imagen de fondo */
+  background-size: cover; /* La imagen cubrirá todo el fondo sin distorsión */
+  background-position: center; /* Centra la imagen en la pantalla */
+  background-repeat: no-repeat; /* Evita que la imagen se repita */
+}
+
+/*botone principal, color naranja font grande*/
+.btn-orange{
+  font-size: 25px;
+  font-weight: 500;
+  background-color: var(--color-principal-yellow);
+  border-color: var(--color-secundario-orange);
+
+}
+.btn-orange:hover{
+  background-color: var(--color-secundario-orange);
+  border-color: var(--color-secundario-orange);
+}
+
+
+.bg-orange{
+  background-color: var(--color-principal-orange);
+}
+.bg-gray{
+  background-color: var(--color-principal-orange);
+}
+
+
+.logo-small{
+  width:40%;
+}
+
+
+/*para que parpadee el texto de inicio*/
+@keyframes parpadeo {
+  0%, 100% {
+      opacity:  1; /* Texto visible */
+  }
+  50% {
+      opacity: 0; /* Texto invisible */
+  }
+}
+.parpadea {
+  animation: parpadeo 1.5s infinite; /* Duración de 1 segundo, ciclo infinito */
+} 
+
+.principal-text{
+  background-color: #140922;
+  color: var(--color-principal-orange);
+  font-weight: bolder;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 5px 5px 10px #140922;
+}
+
+
