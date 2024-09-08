@@ -13,3 +13,16 @@ document.addEventListener('keydown', function(event) {
   }
 
 });
+
+
+// Función para abrir el modal del Leaderboard cuando se presione el botón con ID BtnLeaderboard
+document.getElementById('BtnLeaderboard').addEventListener('click', function() {
+  // Obtiene el elemento del modal de leaderboard
+  var leaderboardModalElement = document.getElementById('LeaderboardModal');
+  
+  // Checa si tiene la clase "show" para que no se vuelva a abrir si ya está abierta
+  if (!leaderboardModalElement.classList.contains('show')) {
+    var leaderboardModal = new bootstrap.Modal(leaderboardModalElement);
+    leaderboardModal.show();
+  }
+});

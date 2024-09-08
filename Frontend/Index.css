@@ -65,4 +65,21 @@ body {
   box-shadow: 5px 5px 10px #140922;
 }
 
+.table {
+  margin-top: 20px;
+}
 
+
+.modal-content {
+  background-color: #FFF5E1;
+  border: 2px solid #D35400;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f3e3a2; /* Alternar filas con tonos naranjas claros */
+}
+
+.table th {
+  background-color: #ffce0a;
+  color: #FFFFFF;
+}
