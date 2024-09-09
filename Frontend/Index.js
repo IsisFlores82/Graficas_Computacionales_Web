@@ -202,11 +202,17 @@ document.getElementById('joinGameButton').addEventListener('click', function() {
     var joinGameModal = bootstrap.Modal.getInstance(joinGameModalElement);
     if (joinGameModal) {
       joinGameModal.hide();
+      window.location.href = 'UI.html';
     }
   } else {
     alert('Por favor, selecciona una partida antes de unirte.');
   }
 });
+
+document.getElementById('startGameButton').addEventListener('click', function() {
+      window.location.href = 'UI.html';
+});
+
 
 // Valor del porcentaje de la barra de volumen 
 const volumeSlider = document.getElementById('volumegame');

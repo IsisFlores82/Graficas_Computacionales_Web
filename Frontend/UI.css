@@ -1,0 +1,85 @@
+:root {
+    --color-principal-orange: #ffb730;  
+    --color-secundario-orange: #db991e;
+  
+    --color-principal-yellow: #ffce0a;
+    --color-principal-red: #ec0911;
+  
+  }
+/*botone principal, color naranja font grande*/
+.btn-orange{
+    font-size: 25px;
+    font-weight: 500;
+    background-color: var(--color-principal-yellow);
+    border-color: var(--color-secundario-orange);
+  
+  }
+  .btn-orange:hover{
+    background-color: var(--color-secundario-orange);
+    border-color: var(--color-secundario-orange);
+  }
+  
+  
+  .bg-orange{
+    background-color: var(--color-principal-orange);
+  }
+  .bg-gray{
+    background-color: var(--color-principal-orange);
+  }
+  
+  
+  .logo-small{
+    width:40%;
+  }
+  
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-image: url('https://cdn.arstechnica.net/wp-content/uploads/sites/3/2016/08/Overcooked_Boat.png'); /* Reemplaza 'fondo.jpg' con la imagen que desees */
+    background-size: cover;
+    background-position: center;
+}
+
+.vidas, .puntaje, .hamburguesa {
+    position: absolute;
+    color: white;
+}
+
+.vidas {
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+}
+
+.vidas img {
+    width: 125px;
+    height: 100px;
+    margin-right: 5px;
+}
+
+.puntaje {
+    top: 20px;
+    right: 20px;
+    font-size: 5em;
+    color: #ffce0a;
+}
+
+.hamburguesa {
+    bottom: 20px;
+    right: 20px;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hamburguesa img {
+    width: 200px;
+    height: 200px;
+}
