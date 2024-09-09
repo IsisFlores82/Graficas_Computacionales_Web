@@ -21,8 +21,10 @@
 <body>
 
   <div class="d-flex flex-column w-100 vh-100 align-items-center justify-content-center">
-    <br>
-    <h1 class="parpadea principal-text"> Presiona ENTER para continuar!</h1>
+    <div class="image-text-container">
+      <img src="dish-dash-logo.jpeg" alt="DISH DASH!" class="background-image">
+      <h1 class="parpadea principal-text">Presiona ENTER para continuar!</h1>
+    </div>
 
      
 
@@ -35,20 +37,127 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body d-flex flex-column align-items-center justify-content-center">
-            <button class="btn btn-secondary btn-orange"> Comenzar</button>
+            <button id="BtnComenzar" class="btn btn-secondary btn-orange"> Comenzar</button>
             <br>
             <button id="BtnLeaderboard" class="btn btn-secondary btn-orange"> Leaderboard</button>
             <br>
             <button class="btn btn-secondary btn-orange"> Settings</button>
             <br>
           </div>  
-          
         </div>
       </div>
     </div>
 
+<!-- Modal para Crear o Unirse a una Partida -->
+<div class="modal fade" id="GameMenuModal" tabindex="-1" aria-labelledby="GameMenuLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-body-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="GameMenuLabel">Selecciona una Opción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex flex-column align-items-center justify-content-center">
+        <!-- Campo para ingresar el nombre de usuario -->
+        <div class="form-group w-100 d-flex flex-column align-items-center">
+          <label for="usernameInput" class="form-label text-center">Ingresa tu nombre de usuario</label>
+          <input type="text" id="usernameInput" class="form-control w-50 text-center" placeholder="Tu nombre de usuario" required>
+          <small class="text-danger d-none" id="usernameError">Por favor, ingresa un nombre de usuario.</small>
+        </div>
+
+        <!-- Botones para Crear o Unirse a una Partida -->
+        <button id="BtnCreateGame" class="btn btn-secondary btn-orange m-2">Crear Partida</button>
+        <button id="BtnSearchGame" class="btn btn-secondary btn-orange m-2">Buscar Partida</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Crear Partida -->
+<div class="modal fade" id="CreateGameModal" tabindex="-1" aria-labelledby="CreateGameLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-body-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="CreateGameLabel">Crear Partida</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Selección de Mapa -->
+        <div class="mb-3">
+          <label for="mapSelect" class="form-label">Selecciona un Mapa</label>
+          <select id="mapSelect" class="form-select" required>
+            <option value="" disabled selected>Selecciona un mapa</option>
+            <option value="map1">Mapa 1</option>
+            <option value="map2">Mapa 2</option>
+            <option value="map3">Mapa 3</option>
+            <!-- Agrega más opciones de mapa según sea necesario -->
+          </select>
+        </div>
+
+        <!-- Selección de Dificultad -->
+        <div class="mb-3">
+          <label for="difficultySelect" class="form-label">Selecciona la Dificultad</label>
+          <select id="difficultySelect" class="form-select" required>
+            <option value="" disabled selected>Selecciona la dificultad</option>
+            <option value="easy">Fácil</option>
+            <option value="hard">Difícil</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="gamemodeSelect" class="form-label">Selecciona el Modo de Juego</label>
+          <select id="gamemodeSelect" class="form-select" required>
+            <option value="" disabled selected>Selecciona el Modo de Juego</option>
+            <option value="Stage">Stage</option>
+            <option value="Infinito">Infinito</option>
+          </select>
+        </div>
+
+        <!-- Lista de Jugadores en la Sala -->
+        <div class="mb-3">
+          <label class="form-label">Jugadores en la Sala</label>
+          <ul id="playerList" class="list-group mb-3">
+            <!-- Se agregarán jugadores dinámicamente -->
+          </ul>
+        </div>
+
+        <!-- Botón para Empezar Partida -->
+        <button id="startGameButton" class="btn btn-secondary btn-orange w-100">Empezar Partida</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal para Unirse a una Partida -->
+<div class="modal fade" id="JoinGameModal" tabindex="-1" aria-labelledby="JoinGameLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-body-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="JoinGameLabel">Unirse a una Partida</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Lista de Partidas Disponibles -->
+        <div class="mb-3">
+          <label class="form-label">Selecciona una Partida</label>
+          <ul id="availableGamesList" class="list-group mb-3">
+            <li class="list-group-item" data-game="game1">Partida de Nevi</li>
+            <li class="list-group-item" data-game="game2">Partida de Imsis</li>
+            <li class="list-group-item" data-game="game3">Partida de Ryneh</li>
+            <!-- Agrega más elementos según las partidas disponibles -->
+          </ul>
+        </div>
+
+        <!-- Botón para Unirse a la Partida -->
+        <button id="joinGameButton" class="btn btn-secondary btn-orange w-100" disabled>Unirse</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
     <!-- Leaderboard Modal -->
-    <div class="modal fade" id="LeaderboardModal" tabindex="0" aria-labelledby="LeaderboardModalLabel" aria-hidden="true">
+    <div class="modal fade" id="LeaderboardModal" tabindex="-1" aria-labelledby="LeaderboardModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-body-secondary">
          <div class="modal-header">
@@ -60,60 +169,60 @@
               <thead>
                 <tr>
                  <th scope="col">Rank</th>
-                 <th scope="col">Player</th>
-                 <th scope="col">Score</th>
+                 <th scope="col">Jugadores</th>
+                 <th scope="col">Puntuacion</th>
                </tr>
              </thead>
              <tbody>
                <!-- Datos Hardcodeados -->
                <tr>
                   <th scope="row">1</th>
-                  <td>Player1</td>
+                  <td>ryneh,nevi</td>
                   <td>5000</td>
                 </tr>
                 <tr>
                  <th scope="row">2</th>
-                 <td>Player2</td>
+                 <td>binchisas,pedroeml</td>
                  <td>4500</td>
                 </tr>
                <tr>
                  <th scope="row">3</th>
-                 <td>Player3</td>
+                 <td>hola,adios</td>
                  <td>4000</td>
                 </tr>
                 <tr>
                   <th scope="row">4</th>
-                  <td>Player4</td>
+                  <td>que,rechazado</td>
                   <td>3500</td>
                 </tr>
                <tr>
                   <th scope="row">5</th>
-                 <td>Player5</td>
+                 <td>sergiorammus,dobetoons</td>
                   <td>3000</td>
                </tr>
                <tr>
                   <th scope="row">6</th>
-                 <td>Player6</td>
+                 <td>vendo fotos,compro fotos</td>
                  <td>2800</td>
                </tr>
                <tr>
                   <th scope="row">7</th>
-                  <td>Player7</td>
+                  <td>gordo,forro</td>
                   <td>2600</td>
                 </tr>
                <tr>
                   <th scope="row">8</th>
-                  <td>Player8</td>
+                  <td>kai,teo</td>
                   <td>2400</td>
                 </tr>
                 <tr>
                   <th scope="row">9</th>
-                  <td>Player9</td>
+                  <td>natale,moytowni</td>
                  <td>2200</td>
                </tr>
                 <tr>
                   <th scope="row">10</th>
-                  <td>Player10</td>
+                  <td>pantoler,fakedobetoons</td>
                   <td>2000</td>
                 </tr>
               </tbody>

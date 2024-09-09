@@ -57,6 +57,13 @@ body {
 } 
 
 .principal-text{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem; /* Ajusta el tamaño de fuente según tu preferencia */
+  text-align: center;
+  z-index: 1; /* Asegura que el texto esté sobre la imagen */
   background-color: #140922;
   color: var(--color-principal-orange);
   font-weight: bolder;
@@ -82,4 +89,22 @@ body {
 .table th {
   background-color: #ffce0a;
   color: #FFFFFF;
+}
+
+.list-group-item {
+  cursor: pointer;
+}
+
+.list-group-item.active {
+  background-color: #ffce0a;
+  color: white;
+}
+
+.image-text-container {
+  position: relative;
+  display: inline-block;
+}
+
+.background-image {
+  display: block;
 }
