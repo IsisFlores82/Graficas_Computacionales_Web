@@ -81,6 +81,34 @@ document.getElementById('BtnLeaderboard').addEventListener('click', function() {
   }
 });
 
+//Función para abrir el modal de Settings cuando se presione el boton
+document.getElementById('BtnSettings').addEventListener('click', function() {
+  var startModalElement = document.getElementById('StartModal');
+  var settingsmodal = document.getElementById('Settings');
+
+  // Oculta el StartModal si está abierto
+  var startModal = bootstrap.Modal.getInstance(startModalElement);
+  if (startModal) {
+    startModal.hide();
+  }
+
+  // Muestra el GameMenuModal
+  var gameMenuModal = new bootstrap.Modal(settingsmodal);
+  gameMenuModal.show();
+
+  // Oculta el texto parpadea cuando se muestra el modal
+  checkModalsVisibility();
+
+  // Cuando se cierra el GameMenuModal, vuelve a mostrar el StartModal
+  settingsmodal.addEventListener('hidden.bs.modal', function() {
+    // No es necesario crear una nueva instancia, solo muestra la instancia existente
+    startModal.show();
+
+    // Verifica si no hay otros modales visibles antes de mostrar el texto "parpadea"
+    checkModalsVisibility();
+  }, { once: true }); // Asegura que el event listener se ejecute solo una vez
+});
+
 
 // Función para validar que se ingrese un nombre de usuario
 function validateUsername() {
@@ -178,4 +206,27 @@ document.getElementById('joinGameButton').addEventListener('click', function() {
   } else {
     alert('Por favor, selecciona una partida antes de unirte.');
   }
+});
+
+// Valor del porcentaje de la barra de volumen 
+const volumeSlider = document.getElementById('volumegame');
+const volumeValue = document.getElementById('volumeValue');
+
+const volumeSlider1 = document.getElementById('volumemusic');
+const volumeValue1 = document.getElementById('volumeValue2');
+
+const volumeSlider2 = document.getElementById('volumesfx');
+const volumeValue2 = document.getElementById('volumeValue3');
+
+
+volumeSlider.addEventListener('input', function() {
+  volumeValue.textContent = volumeSlider.value + '%';
+});
+
+volumeSlider1.addEventListener('input', function() {
+  volumeValue1.textContent = volumeSlider1.value + '%';
+});
+
+volumeSlider2.addEventListener('input', function() {
+  volumeValue2.textContent = volumeSlider2.value + '%';
 });

@@ -108,3 +108,38 @@ body {
 .background-image {
   display: block;
 }
+
+/*Estilo de la barra de volumen*/
+.volume-slider {
+  width: 200px;
+  border: 20px;
+}
+.volume-value {
+  font-size: 18px;
+  margin-left: 10px;
+}
+
+.volume-slider::-webkit-slider-thumb  {
+  background-color: #ffce0a;
+}
+
+/*resolucion*/
+.container-mt-5{
+  align-content: center;
+  }
+  
+  .btn-outline-custom {
+    border-color: #ffce0a; 
+    color: black;
+  }
+  
+  .btn-outline-custom:hover {
+    background-color: #ffce0a;
+    color: white;
+  }
+  
+  .btn-check:checked + .btn-outline-custom {
+    background-color: #ffce0a;
+    color: white;
+    border-color: #ffce0a;
+  }
