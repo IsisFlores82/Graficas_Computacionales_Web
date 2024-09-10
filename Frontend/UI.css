@@ -38,7 +38,7 @@ body, html {
     padding: 0;
     height: 100%;
     font-family: Arial, sans-serif;
-    background-image: url('https://cdn.arstechnica.net/wp-content/uploads/sites/3/2016/08/Overcooked_Boat.png'); /* Reemplaza 'fondo.jpg' con la imagen que desees */
+    background-image: url('ejemplo.png'); /* Reemplaza 'fondo.jpg' con la imagen que desees */
     background-size: cover;
     background-position: center;
 }
