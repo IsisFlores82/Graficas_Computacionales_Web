@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  
+
   <link rel="stylesheet" href="Index.css">
 
 </head>
@@ -41,7 +41,7 @@
             <br>
             <button id="BtnLeaderboard" class="btn btn-secondary btn-orange"> Leaderboard</button>
             <br>
-            <button class="btn btn-secondary btn-orange"> Settings</button>
+            <button id="BtnSettings" class="btn btn-secondary btn-orange"> Settings</button>
             <br>
           </div>  
         </div>
@@ -89,7 +89,6 @@
             <option value="map1">Mapa 1</option>
             <option value="map2">Mapa 2</option>
             <option value="map3">Mapa 3</option>
-            <!-- Agrega más opciones de mapa según sea necesario -->
           </select>
         </div>
 
@@ -116,7 +115,7 @@
         <div class="mb-3">
           <label class="form-label">Jugadores en la Sala</label>
           <ul id="playerList" class="list-group mb-3">
-            <!-- Se agregarán jugadores dinámicamente -->
+            <!-- Se agregan los jugadores despues -->
           </ul>
         </div>
 
@@ -145,7 +144,6 @@
             <li class="list-group-item" data-game="game1">Partida de Nevi</li>
             <li class="list-group-item" data-game="game2">Partida de Imsis</li>
             <li class="list-group-item" data-game="game3">Partida de Ryneh</li>
-            <!-- Agrega más elementos según las partidas disponibles -->
           </ul>
         </div>
 
@@ -236,9 +234,58 @@
   </div>
 
   
-
-  
   <script src="Index.js"></script>
+  <!-- Modal para Crear o Unirse a una Partida -->
+<div class="modal fade" id="Settings" tabindex="-1" aria-labelledby="SettingsMenu" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-body-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="GameMenuLabel">Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex flex-column align-items-center justify-content-center">
+        <!-- Configuraciones -->
+        <div class="d-flex align-items-center">
+          <label for="volume" class="form-label me-3" id="vg">Volumen General:</label>
+          <!-- Barra de volumen -->
+          <input type="range" class="form-range volume-slider" id="volumegame" min="0" max="100" value="50">
+          <span id="volumeValue" class="volume-value">50%</span>
+        </div>
 
+        <div class="d-flex align-items-center">
+          <label for="volume" class="form-label me-3" id="vmsc">Volumen Música:</label>
+          <!-- Barra de volumen -->
+          <input type="range" class="form-range volume-slider" id="volumemusic" min="0" max="100" value="50">
+          <span id="volumeValue2" class="volume-value">50%</span>
+        </div>
+
+        <div class="d-flex align-items-center">
+          <label for="volume" class="form-label me-3" id="vsfx">Volumen SFX:</label>
+          <!-- Barra de volumen -->
+          <input type="range" class="form-range volume-slider" id="volumesfx" min="0" max="100" value="50">
+          <span id="volumeValue3" class="volume-value">50%</span>
+        </div>
+        <br>
+        <label for="resolution" class="resolucionlabel">Resolución de pantalla</label>
+        <br>
+        <div class="container-mt-5">          
+          <div class="btn-group" role="group" aria-label="Selector">
+            <input type="radio" class="btn-check" name="options" id="baja" autocomplete="off">
+            <label class="btn btn-outline-custom" for="baja">Baja</label>
+        
+            <input type="radio" class="btn-check" name="options" id="normal" autocomplete="off" checked>
+            <label class="btn btn-outline-custom" for="normal">Normal</label>
+        
+            <input type="radio" class="btn-check" name="options" id="alta" autocomplete="off">
+            <label class="btn btn-outline-custom" for="alta">Alta</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+<script src="Index.js"></script>
 </body>
 </html>
