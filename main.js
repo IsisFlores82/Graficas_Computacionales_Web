@@ -107,6 +107,8 @@ stoveRaw.SetPosition(6,0,-2)
 stoveRaw.AddToScene(scene);
 
 const trash = new CargarModelo('Models/trash/trash', manager);
+trash.SetPosition(1.5,0,2)
+trash.Scale(1.4, 1.4, 1.4);
 trash.AddToScene(scene);
 
 const chef = new CargarModelo('Models/chef/chef', manager);
@@ -125,6 +127,25 @@ const floor = new CargarModelo('Models/floor/floor', manager);
 floor.SetPosition(2,0,-6)
 floor.Scale(0.8, 0.8, 0.8)
 floor.AddToScene(scene);
+
+
+const table = new CargarModelo('Models/table/table', manager);
+table.SetPosition(0,0,2)
+table.AddToScene(scene);
+
+const bigtable = new CargarModelo('Models/bigtable/bigtable', manager);
+bigtable.SetPosition(-2.3,0,2)
+bigtable.AddToScene(scene);
+
+const bread = new CargarModelo('Models/bread/bread', manager);
+bread.SetPosition(3,0,2)
+bread.AddToScene(scene);
+
+const meat = new CargarModelo('Models/meat/meat', manager);
+meat.SetPosition(5,0,2)
+meat.AddToScene(scene);
+
+
 
 // //scene.add(cube);
 // const positionVec = new THREE.Vector3(-5, 0, 0); 
