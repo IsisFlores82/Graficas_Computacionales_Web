@@ -1,0 +1,33 @@
+# Blender 4.0.2 MTL File: 'None'
+# www.blender.org
+
+newmtl Counters_01.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd ../texturas/Counters_01_BaseColor.png
+map_Ns ../texturas/Counters_01_Roughness.png
+map_refl ../texturas/Counters_01_Metallic.png
+
+newmtl Material.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alum.webp
+
+newmtl Table.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.799238 0.007499 0.009133
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
