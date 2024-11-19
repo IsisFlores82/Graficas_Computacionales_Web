@@ -41,7 +41,7 @@ export class CargarModelo {
     this.boundingBoxHelper = new THREE.BoxHelper(this.objeto3D, 0xff0000); // color rojo
     this.boundingBoxHelper.update(); // Actualizar la caja con las dimensiones del objeto
     this.scene.add(this.boundingBoxHelper);
-    this.toggleBoundingBoxVisibility();
+    //this.toggleBoundingBoxVisibility();
   }
 
   Scale(ScaleX, ScaleY, ScaleZ) {
@@ -65,6 +65,11 @@ export class CargarModelo {
   AddToScene(scene) {
     scene.add(this.objeto3D);
   }
+  
+  RemoveFromScene(scene) {
+    scene.remove(this.objeto3D);
+  }
+
 
   Rotate(axis, angle) {
     const rotationAxis = new THREE.Vector3(axis.x, axis.y, axis.z).normalize();

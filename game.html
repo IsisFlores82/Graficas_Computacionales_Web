@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dish Dash</title>
-    <script src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 
-    <script type="importmap">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dish Dash</title>
+  <script src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+
+  <script type="importmap">
       {
         "imports": {
           "three": "https://cdn.jsdelivr.net/npm/three@v0.167.1/build/three.module.js",
@@ -18,9 +19,35 @@
       }
   </script>
 </head>
+
 <body>
-    <!-- Import the main JavaScript file as a module -->
-    <script type="module" src="/main.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Elemento para mostrar el cronómetro -->
+  <div id="cronometro" class="cronometro" style="
+   position: fixed;
+    top: 10px; 
+    right: 10px; 
+    font-size: 24px; 
+    color: #fff; 
+    background-color: rgba(0, 0, 0, 0.5); 
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000; /* Asegura que el cronómetro esté por encima de otros elementos */
+  ">
+    00:00</div>
+
+
+  <img id="inventory-image" src="Inventory/empty.png" alt="Descripción de la imagen" class="inventory-image" style="
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 300px;
+    height: auto;
+    z-index: 1000;
+  ">
+  <!-- Import the main JavaScript file as a module -->
+  <script type="module" src="/main.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
+
 </html>
