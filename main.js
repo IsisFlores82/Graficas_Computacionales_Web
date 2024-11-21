@@ -17,17 +17,20 @@ camera.lookAt(0, 0, 0);
 // Mapa Restaurate = 1
 // Mapa Navidad = 2
 // Mapa Crustacio = 3 (Multijugador)
-let SelectedMap = 1;
+let SelectedMap = 2;
 
 //variables del mapa de navidad
 let soda, deliver, letuce, tomato, stove, bigtable2, bigtable3, chef, bigtable, table, trash,
-    bread, table2, meat, stoveMeat, stoveBurned, stoveRaw, chef2;
+  bread, table2, meat, stoveMeat, stoveBurned, stoveRaw, chef2;
 
 //mas necesarias para el mapa de crustacio
-let soda2, deliver2, letuce2, stove2, bread2, table3, table4, stoveMeat2, stoveBurned2, stoveRaw2;
+let soda2, deliver2, letuce2, stove2, bread2, table3, table4, stoveMeat2, stoveBurned2, stoveRaw2, trash2;
 
 //mas necesarias para el mapa de restaurant
 let table5;
+
+//pausa
+let pause = false;
 
 // Inventario del jugador
 const inventario = new Inventario();
@@ -45,6 +48,31 @@ let startTime;
 let cronometroInterval;
 let fourSecondsPassed = false;
 let cookingTimeout;
+
+// Variables para las ordenes
+const orders = [
+  { id: 1, items: { bread: true, donemeat: true, letuce: true }, path: 'Orders/Hamb1.png' },
+  { id: 2, items: { bread: true, donemeat: true, tomate: true }, path: 'Orders/Hamb2.png' },
+  { id: 3, items: { hamburguer: true }, path: 'Orders/Hamb3.png' },
+  { id: 4, items: { bread: true, donemeat: true }, path: 'Orders/Hamb4.png' },
+  { id: 5, items: { letuce: true, tomate: true }, path: 'Orders/Salad.png' },
+  { id: 6, items: { soda: true }, path: 'Orders/Soda.png' }
+];
+
+//arreglo de ordenes actuales
+let currentOrders = [];
+let currentOrders2 = [];
+
+let maxOrders = 11;
+// Generar órdenes aleatorias
+setInterval(generateRandomOrder, 10000); // Intenta generar una nueva orden cada 10 segundos
+
+let lives = 3; // Cantidad de vidas
+const fullLifeImage = 'Assets/heat_icon.png'; 
+const emptyLifeImage = 'Assets/heat_icon_empty.png';
+
+let Score = 0; // Puntaje
+
 
 
 const manager = new THREE.LoadingManager();
@@ -86,6 +114,9 @@ $(document).ready(function () {
 
   // Velocidad del movimiento
   const speed = 0.1;
+
+  //Renderizado de vidas
+  renderLives();
 
   // Evento para cuando una tecla se presiona
   $(document).keydown(function (e) {
@@ -133,6 +164,8 @@ $(document).ready(function () {
 
       if (isCollision(chef, deliver)) {
         console.log("Colisión detectada entre el chef y la entrega");
+
+        checkDelivery(inventario);
         imgInventario = inventario.completeOrder();
       }
 
@@ -198,19 +231,102 @@ $(document).ready(function () {
 
     }
 
+
     if (e.key.toLowerCase() === '0') {
-      //cosas para coolisiones en el para de multijugador
-      if (SelectedMap == 3) {
+
+      //si estas colisionandon con la estufa y el tomate a la vez, se le da prioridad al tomate
+      if (isCollision(chef2, tomato) && isCollision(chef2, stoveBurned)) {
 
         if (isCollision(chef2, tomato)) {
-          console.log("Colisión detectada entre el chef2 y la lechuga");
+          console.log("Colisión detectada entre el chef2 y el tomate");
           imgInventario2 = inventario2.getTomate();
         }
-        
-        if (isCollision(chef2, meat)) {
-          console.log("Colisión detectada entre el chef2 y la carne");
-          imgInventario2 = inventario2.getRawMeat();
+
+      }
+
+      if (isCollision(chef2, letuce) && isCollision(chef2, stoveMeat)) {
+
+        if (isCollision(chef2, letuce)) {
+          console.log("Colisión detectada entre el chef2 y la lechuga");
+          // Lógica para recoger la entrega
+          imgInventario2 = inventario2.getLetuce();
         }
+
+      }
+
+      if (isCollision(chef2, tomato)) {
+        console.log("Colisión detectada entre el chef2 y el tomate");
+        imgInventario2 = inventario2.getTomate();
+      }
+
+      if (isCollision(chef2, meat)) {
+        console.log("Colisión detectada entre el chef2 y carne");
+        // Lógica para recoger la carne
+        imgInventario2 = inventario2.getRawMeat();
+      }
+
+      if (isCollision(chef2, deliver)) {
+        console.log("Colisión detectada entre el chef2 y la entrega");
+
+        checkDelivery(inventario2);
+        imgInventario2 = inventario2.completeOrder();
+      }
+
+      if (isCollision(chef2, letuce)) {
+        console.log("Colisión detectada entre el chef2 y la lechuga");
+        // Lógica para recoger la entrega
+        imgInventario2 = inventario2.getLetuce();
+      }
+
+      if (isCollision(chef2, bread)) {
+        console.log("Colisión detectada entre el chef2 y el pan");
+        // Lógica para recoger la entrega
+        imgInventario2 = inventario2.getBread();
+      }
+
+      if (isCollision(chef2, trash)) {
+        console.log("Colisión detectada entre el chef2 y la basura");
+        // Lógica para recoger la entrega
+        imgInventario2 = inventario2.trash();
+      }
+
+      if (isCollision(chef2, soda)) {
+        console.log("Colisión detectada entre el chef2 y la soda2");
+        // Lógica para recoger la entrega
+        imgInventario2 = inventario2.getSoda();
+      }
+
+      //pone a cocinar la carne cruda
+      if (isCollision(chef2, stove) && stoveState == 1 && inventario2.rawmeat) {
+        console.log("Colisión detectada entre el chef2 y la estufa");
+        // Lógica para recoger la entrega
+        imgInventario2 = inventario2.trash();
+        stoveState = 2; //cruda cocinando
+        startCronometro(4000);
+      }
+
+      if (isCollision(chef2, stove) && stoveState == 2) {    // && inventario.isInventoryEmpty()
+        console.log("Colisión detectada entre el chef2 y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
+        console.log("La carne se esta cocinando, espera un momento");
+      }
+
+      if (isCollision(chef2, stove) && stoveState == 3) {   // para recoger la carne cocida
+        console.log("Colisión detectada entre el chef2 y la estufa con carne cocida");
+        // Lógica para recoger la entrega
+        imgInventario2 = inventario2.getDoneMeat();
+        stoveState = 1; //vaciar la estufa
+        stopCronometro();
+      }
+
+      if (isCollision(chef2, stove) && stoveState == 4 && inventario2.isInventoryEmpty()) {    //para recoger la carne quemada
+        console.log("Colisión detectada entre el chef2 y la estufa con carne quemada");
+        // Lógica para recoger la entrega
+        imgInventario2 = inventario2.getBurnedMeat();
+        stoveState = 1; //vaciar la estufa
+      }
+
+      //segunda estufa     
+      if (SelectedMap == 3) {
 
         if (isCollision(chef2, letuce2)) {
           console.log("Colisión detectada entre el chef2 y la lechuga2");
@@ -233,7 +349,7 @@ $(document).ready(function () {
           imgInventario2 = inventario2.trash();
         }
 
-        //segunda estufa
+
         //pone a cocinar la carne cruda
         if (isCollision(chef2, stove2) && stoveState2 == 1 && inventario2.rawmeat) {
           console.log("Colisión detectada entre el chef2 y la estufa2");
@@ -261,10 +377,17 @@ $(document).ready(function () {
           // Lógica para recoger la entrega
           imgInventario2 = inventario2.getBurnedMeat();
           stoveState2 = 1; //vaciar la estufa
-
         }
 
+
+
       }
+
+      if (imgInventario2) {
+        console.log("imgInventario2:", imgInventario2);
+        InventoryImage2(imgInventario2);
+      }
+
     }
 
     //COSAS CON FIN DE DEBUGGEO, NO SE DEBERIAN DEJAR EN EL JUEGO FINAL (no molestar Zzz)
@@ -284,12 +407,16 @@ $(document).ready(function () {
     if (e.key.toLowerCase() === '4') {
       stoveState = 4;
     }
+    if (e.key.toLowerCase() === '5') {
+      togglePause();
+    }
+    if (e.key.toLowerCase() === '6') {
+     console.log("Ordenes actuales: ", currentOrders);
+    }
     if (e.key.toLowerCase() === '9') {
       inventario2.mostrarInventario();
     }
-
   });
-
 
   // Función de animación para mover los chefs
   function animate() {
@@ -381,7 +508,7 @@ $(document).ready(function () {
       bigtable.Update();
       bigtable3.Update();
       chef.Update();
-      chef2.Update();
+
       trash.Update();
       stoveBurned.Update();
       stoveBurned2.Update();
@@ -390,6 +517,7 @@ $(document).ready(function () {
       stoveMeat.Update();
       stoveMeat2.Update();
       trash2.Update();
+
     }
 
     // Cambiar el estado de la ESTUFA 1 ------
@@ -463,6 +591,7 @@ $(document).ready(function () {
     }
 
     chef.Update();
+    chef2.Update();
 
     // Vuelve a llamar a la función en el siguiente cuadro    
     requestAnimationFrame(animate);
@@ -478,6 +607,14 @@ function InventoryImage(imagePath) {
   const inventoryImg = document.getElementById('inventory-image');
   if (inventoryImg) {
     inventoryImg.src = imagePath;
+  }
+}
+
+// Función para actualizar la imagen del invnetario
+function InventoryImage2(imagePath) {
+  const inventoryImg2 = document.getElementById('inventory-image2');
+  if (inventoryImg2) {
+    inventoryImg2.src = imagePath;
   }
 }
 
@@ -528,8 +665,8 @@ function anyCollisionRestaurant(chef) {
   if (
     isCollision(chef, soda) || isCollision(chef, deliver) || isCollision(chef, letuce) ||
     isCollision(chef, tomato) || isCollision(chef, stove) || isCollision(chef, bigtable2) ||
-    isCollision(chef, bigtable3) || isCollision(chef, bigtable) ||
-    isCollision(chef, table) || isCollision(chef, trash) || isCollision(chef, bread) || isCollision(chef, table2) ||
+    isCollision(chef, bigtable3) || isCollision(chef, bigtable) || isCollision(chef, table) ||
+    isCollision(chef, trash) || isCollision(chef, bread) || isCollision(chef, table2) ||
     isCollision(chef, meat) || isCollision(chef, table5)
   ) {
     return true;
@@ -643,20 +780,29 @@ function MapaRestaurant() {
   table2.Scale(1.2, 1.2, .8);
 
   chef = new CargarModelo('Models/chef/chef', manager, scene);
-  chef.SetPosition(0, 0, 1)
+  chef.PosX = -2;
+  chef.PosZ = 1;
+  chef.SetPositionThis();
+  chef.SetPosition(-2, 0, 1)
   chef.AddToScene(scene);
+
+  chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
+  chef2.PosX = 1;
+  chef2.PosZ = 1;
+  chef2.SetPositionThis();
+  chef2.SetPosition(1, 0, 1);
+  chef2.AddToScene(scene);
 
   // chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
   // chef2.PosX = 5;
   // chef2.PosZ = 1;
-  // chef2.SetPosition(2, 0, 1)
+  // chef2.SetPosition(2, 0, 1);
   // chef2.AddToScene(scene);
 
   bigtable = new CargarModelo('Models/bigtable/bigtable', manager, scene);
   bigtable.SetPosition(-4.1, 0, 4)
   bigtable.AddToScene(scene);
   bigtable.Scale(1.3, 1.2, 1.2);
-
 
   trash = new CargarModelo('Models/trash/trash', manager, scene);
   trash.SetPosition(-1.3, 0, 4.05)
@@ -727,22 +873,22 @@ function MapaChristmas() {
   tomato.Scale(1.3, 1.1, 1.3)
 
   stove = new CargarModelo('Models/stove/stove', manager, scene);
-  stove.SetPosition(-2.7, 0, -1.5)
+  stove.SetPosition(-2.9, 0, -1.5)
   stove.AddToScene(scene);
   stove.Scale(1.8, 1.7, 1.7)
 
   stoveRaw = new CargarModelo('Models/stove/raw/stoveAndMeatRaw', manager, scene);
-  stoveRaw.SetPosition(-2.7, 0, -1.5)
+  stoveRaw.SetPosition(-2.9, 0, -1.5)
   stoveRaw.AddToScene(scene);
   stoveRaw.Scale(1.8, 1.7, 1.7);
 
   stoveMeat = new CargarModelo('Models/stove/done/stoveAndMeat', manager, scene);
-  stoveMeat.SetPosition(-2.7, 0, -1.5)
+  stoveMeat.SetPosition(-2.9, 0, -1.5)
   stoveMeat.AddToScene(scene);
   stoveMeat.Scale(1.8, 1.7, 1.7);
 
   stoveBurned = new CargarModelo('Models/stove/burned/stoveAndMeatBurned', manager, scene);
-  stoveBurned.SetPosition(-2.7, 0, -1.5);
+  stoveBurned.SetPosition(-2.9, 0, -1.5);
   stoveBurned.AddToScene(scene);
   stoveBurned.Scale(1.8, 1.7, 1.7);
 
@@ -757,14 +903,14 @@ function MapaChristmas() {
   bigtable3.Scale(1.4, 1.2, 1)
 
   chef = new CargarModelo('Models/chef/chef', manager, scene);
-  chef.SetPosition(0, 0, 1)
+  chef.SetPosition(-1, 0, 1)
   chef.AddToScene(scene);
 
-  // chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
-  // chef2.PosX = 5;
-  // chef2.PosZ = 1;
-  // chef2.SetPosition(2, 0, 1)
-  // chef2.AddToScene(scene);
+  chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
+  chef2.PosX = 1;
+  chef2.PosZ = 1;
+  chef2.SetPosition(1, 0, 1)
+  chef2.AddToScene(scene);
 
   bigtable = new CargarModelo('Models/bigtable/bigtable', manager, scene);
   bigtable.SetPosition(-4, 0, 4)
@@ -970,13 +1116,11 @@ function MapaCrustacio() {
   chef.AddToScene(scene);
 
   chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
-  chef2.PosX = 5;
-  chef2.PosZ = 1;
-  chef2.SetPosition(2, 0, 1)
+  chef2.PosX = 3;
+  chef2.PosZ = 2;
+  chef2.SetPositionThis();
+  chef2.SetPosition(3, 0, 2);
   chef2.AddToScene(scene);
-
-
-
 
   // Crear la luz spot
   const spotLight = new THREE.SpotLight(0xffec77, 10); // Luz blanca con intensidad 1
@@ -1084,4 +1228,117 @@ function stopCronometro() {
   clearInterval(cronometroInterval);
   clearTimeout(cookingTimeout);
   console.log("Cronómetro detenido");
+}
+
+function generateRandomOrder() {
+
+  if (!pause && currentOrders.length < maxOrders) {
+    const randomIndex = Math.floor(Math.random() * orders.length);
+    const randomOrder = orders[randomIndex];
+    currentOrders.push(randomOrder);
+    console.log('Nueva orden generada:', randomOrder);
+
+    const imagePath = randomOrder.path; // Path de la imagen
+    console.log('Imagen de la orden:', imagePath);
+
+    // Usa un atributo único para identificar la imagen
+    const imgElement = `<img src="${imagePath}" alt="Order" data-order-id="${randomOrder.id}">`;
+    $('#gallery').append(imgElement);
+  }
+  if (currentOrders.length >= maxOrders) {
+    console.log("Maximo de ordenes alcanzado");
+    loseLife();
+  }
+
+
+}
+
+function togglePause() {
+  pause = !pause;
+  console.log(pause ? "Juego pausado" : "Juego reanudado");
+}
+
+function compareOrder(inventory, order) {
+  const orderItems = order.items;
+  for (const key in orderItems) {
+    if (orderItems[key] && !inventory[key]) {
+      // Si el ingrediente es requerido por la orden y no está en el inventario, falla
+      return false;
+    }
+  }
+  // Si pasa todas las verificaciones, la orden es cumplida
+  return true;
+}
+
+function checkDelivery(inventory) {
+  for (let i = currentOrders.length - 1; i >= 0; i--) {
+    if (compareOrder(inventory, currentOrders[i])) {
+      const orderId = currentOrders[i].id; // Guarda el ID antes de eliminar
+      console.log('Orden cumplida:', currentOrders[i]);
+      Score += 10;
+      updateScore(Score);
+      currentOrders.splice(i, 1); // Elimina la orden cumplida
+      removeOrder(orderId); // Elimina la imagen asociada
+      return true; // Detiene la función si cumple con una orden
+    }
+  }
+  console.log('Orden no cumplida');
+  loseLife();
+  return false;
+}
+
+function removeOrder(orderId) {
+  // Elimina solo la primera instancia visual de la imagen
+  const $imageToRemove = $(`#gallery img[data-order-id="${orderId}"]:first`);
+  if ($imageToRemove.length > 0) {
+    $imageToRemove.remove(); // Remueve la imagen de la galería
+    console.log('Imagen eliminada:', orderId);
+  } else {
+    console.log('No se encontró la imagen para el ID:', orderId);
+  }
+}
+
+function renderLives() {
+  const $livesContainer = $('#player-lives');
+  $livesContainer.empty(); // Limpia el contenedor antes de renderizar
+
+  for (let i = 0; i < 3; i++) { // Asume que siempre hay un máximo de 3 vidas
+    const imgPath = i < lives ? fullLifeImage : emptyLifeImage;
+    const lifeImage = `<img src="${imgPath}" alt="Life">`;
+    $livesContainer.append(lifeImage);
+  }
+}
+
+function loseLife() {
+  if (lives > 1) {
+    lives--; // Reduce una vida
+    renderLives(); // Actualiza la interfaz
+    console.log(`Vidas restantes: ${lives}`);
+  }
+  else if (lives == 1) {
+    lives--;
+    renderLives(); // Actualiza la interfaz
+    console.log('Game Over');
+    gameOver(); 
+  }
+}
+
+function gameOver() {
+  const gameOverImage = 'Assets/game_over.png'; // Ruta de tu imagen de Game Over
+
+  // Crea el contenedor de la pantalla de Game Over
+  const overlay = `
+    <div id="game-over-overlay">
+      <img src="${gameOverImage}" alt="Game Over">
+    </div>
+  `;
+
+  // Añádelo al body
+  $('body').append(overlay);
+
+  console.log('Game Over');
+}
+
+function updateScore(newScore) {
+  $('#score-value').text(newScore); // Actualiza el texto en la card
 }

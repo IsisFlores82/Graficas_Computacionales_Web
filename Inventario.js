@@ -39,27 +39,31 @@ export class Inventario {
       this.makeHamburger();
       return "Inventory/All.png";
     } 
-    if (this.tomate && this.bread && this.donemeat) {
+    else if (this.hamburguer) {
+      console.log("Ya tienes Hamburguesa");
+      return "Inventory/All.png";
+    }
+    else if (this.tomate && this.bread && this.donemeat) {
       console.log("tamate, pan y carne");
       return "Inventory/pan_tom_carne.png";
     }
-    if (this.tomate && this.letuce && this.bread) {
+    else if (this.tomate && this.letuce && this.bread) {
       console.log("tomate, lechuga y pan");
       return "Inventory/pan_lec_tom.png";
     }
-    if (this.tomate && this.letuce && this.donemeat) {
+    else if (this.tomate && this.letuce && this.donemeat) {
       console.log("tomate, lechuga y carne");
       return "Inventory/tom_carne_let.png";
     }
-    if (this.tomate && this.bread) {
+    else if (this.tomate && this.bread) {
       console.log("pan y tomate");
       return "Inventory/pan_tom.png";
     }
-    if (this.tomate && this.letuce) {
+    else if (this.tomate && this.letuce) {
       console.log("tamate y lechuga");
       return "Inventory/let_tom.png";
     }
-    if (this.tomate && this.donemeat) {
+    else if (this.tomate && this.donemeat) {
       console.log("tamate y carne");
       return "Inventory/tom_carne.png";
     }
@@ -91,6 +95,10 @@ export class Inventario {
       this.makeHamburger();
       return "Inventory/All.png";
     } 
+    else if (this.hamburguer) {
+      console.log("Ya tienes Hamburguesa");
+      return "Inventory/All.png";
+    }
     else if (this.letuce && this.bread && this.donemeat) {
       console.log("pan, lechuga y carne");
       return "Inventory/pan_lec_carne.png";
@@ -142,6 +150,10 @@ export class Inventario {
       console.log("Hamburguesa completa");
       return "Inventory/All.png";
     }
+    else if (this.hamburguer) {
+      console.log("Ya tienes Hamburguesa");
+      return "Inventory/All.png";
+    }
     else if (this.bread && this.tomate && this.letuce) {
       console.log("pan, lechuga y tomate");
       return "Inventory/pan_lec_tom.png";
@@ -177,8 +189,12 @@ export class Inventario {
     if(this.soda){
       console.log("Manos llenas");
     }
-    else if(this.tomate || this.letuce || this.bread){
-      if(this.manosCalientes){      }
+    else if(this.tomate || this.letuce || this.bread || this.hamburguer){
+      if(this.manosCalientes){  
+        console.log("Manos calientes");
+        this.makeHamburger();
+        return "Inventory/All.png";
+      }
       console.log("No puedes agregar carne cruda a la hamburguesa");
     }
     else {
@@ -305,7 +321,9 @@ export class Inventario {
       return "Inventory/empty.png";
     }
     else {
+      this.trash();
       console.log("No hay nada que entregar");
+      return "Inventory/empty.png";
     }
 
   }
@@ -317,17 +335,19 @@ export class Inventario {
       "Carne cruda: " + this.rawmeat + "\n" +
       "Carne cocida: " + this.donemeat + "\n" +
       "Carne quemada: " + this.burnedmeat + "\n" +
-      "Soda: " + this.soda
+      "Soda: " + this.soda + "\n" + 
+      "Hamburguesa: " + this.hamburguer + "\n"
     );
   }
 
   makeHamburger(){
+    this.hamburguer = true;
     this.tomate = false;
     this.letuce = false;
     this.bread = false;
     this.donemeat = false;
 
-    this.hamburguer = true;
+    
     console.log("Hamburguesa hecha!");
   }
 
