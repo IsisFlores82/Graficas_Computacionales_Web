@@ -17,11 +17,13 @@ camera.lookAt(0, 0, 0);
 // Mapa Restaurate = 1
 // Mapa Navidad = 2
 // Mapa Crustacio = 3 (Multijugador)
-let SelectedMap = 2;
+let SelectedMap = 3;
+
+let Dificulty = 2; // 1 = Facil, 2 = Dificil
 
 //variables del mapa de navidad
 let soda, deliver, letuce, tomato, stove, bigtable2, bigtable3, chef, bigtable, table, trash,
-  bread, table2, meat, stoveMeat, stoveBurned, stoveRaw, chef2;
+  bread, table2, meat, stoveMeat, stoveBurned, stoveRaw, chef2, boots, axis, angle;
 
 //mas necesarias para el mapa de crustacio
 let soda2, deliver2, letuce2, stove2, bread2, table3, table4, stoveMeat2, stoveBurned2, stoveRaw2, trash2;
@@ -64,8 +66,15 @@ let currentOrders = [];
 let currentOrders2 = [];
 
 let maxOrders = 11;
+
+let TimeOrders = 10000;
+
+let orderInterval; 
 // Generar órdenes aleatorias
-setInterval(generateRandomOrder, 10000); // Intenta generar una nueva orden cada 10 segundos
+// if(!pause){
+//   setInterval(generateRandomOrder, TimeOrders); // Intenta generar una nueva orden cada 10 segundos
+// }
+updateOrderInterval();
 
 let lives = 3; // Cantidad de vidas
 const fullLifeImage = 'Assets/heat_icon.png'; 
@@ -73,6 +82,47 @@ const emptyLifeImage = 'Assets/heat_icon_empty.png';
 
 let Score = 0; // Puntaje
 
+//para los powerups
+let isPowerUp = false;
+
+const powerUps = [
+  { type: 'boots', modelPath: 'Models/boots/boots' },
+  { type: 'pan', modelPath: 'Models/pan/pan' },
+  { type: 'time', modelPath: 'Models/time/time' }
+];
+
+
+let possiblePositions;
+
+if(SelectedMap == 1 || SelectedMap == 2){
+
+  possiblePositions = [
+  { x: 2, y: 0, z: 1.5 },
+  { x: 0, y: 0, z: -1.8 },
+  { x: -2, y: 0, z: 2 },
+  { x: 1, y: 0, z: -.5 }
+  ];
+
+}
+if(SelectedMap == 3){
+
+  possiblePositions = [
+  { x: 3.2, y: 0, z: 1.5 },
+  { x: -3, y: 0, z: 2.2 },
+  { x: -3.5, y: 0, z: 2 },
+  { x: 2.8, y: 0, z: 1.5 }
+  ];
+
+}
+
+
+
+// Generar un power-up
+let powerUp;
+
+setInterval(() => {
+  powerUp = generateRandomPowerUp();
+}, 30000); // Genera un power-up cada 30 segundos
 
 
 const manager = new THREE.LoadingManager();
@@ -113,7 +163,8 @@ $(document).ready(function () {
   const keysPressed = {};
 
   // Velocidad del movimiento
-  const speed = 0.1;
+  let speed = inventario.speed;
+  let speed2 = inventario2.speed;
 
   //Renderizado de vidas
   renderLives();
@@ -223,6 +274,38 @@ $(document).ready(function () {
 
       }
 
+
+      if (powerUp && isCollision(chef, powerUp) && isPowerUp) {
+        console.log(`Colisión detectada entre el chef y el ${powerUp.type}`);
+        
+        if (powerUp.type === 'boots') {
+          inventario.speed = 0.2;
+          powerUp.RemoveFromScene(scene);
+          setTimeout(() => {
+            inventario.speed = 0.1;
+            console.log("Speed Up terminado");
+          }, 8000);
+        } 
+        else if (powerUp.type === 'pan') {
+          inventario.manosCalientes = true;
+          powerUp.RemoveFromScene(scene);
+          setTimeout(() => {
+            inventario.manosCalientes = false;
+            console.log("Manos calientes terminado");
+          }, 8000);
+        }
+        else if (powerUp.type === 'time') {
+          pause = true;
+          powerUp.RemoveFromScene(scene);
+          setTimeout(() => {
+            pause = false;
+            console.log("Tiempo extra terminado");
+          }, 8000);
+
+        }
+
+      }
+
       //manda a actualizar la imagen del inventario chef1
       if (imgInventario) {
         console.log(imgInventario);
@@ -265,7 +348,7 @@ $(document).ready(function () {
         imgInventario2 = inventario2.getRawMeat();
       }
 
-      if (isCollision(chef2, deliver)) {
+      if (isCollision(chef2, deliver2)) {
         console.log("Colisión detectada entre el chef2 y la entrega");
 
         checkDelivery(inventario2);
@@ -324,6 +407,38 @@ $(document).ready(function () {
         imgInventario2 = inventario2.getBurnedMeat();
         stoveState = 1; //vaciar la estufa
       }
+
+      if (powerUp && isCollision(chef2, powerUp) && isPowerUp) {
+        console.log(`Colisión detectada entre el chef y el ${powerUp.type}`);
+        
+        if (powerUp.type === 'boots') {
+          inventario2.speed = 0.2;
+          powerUp.RemoveFromScene(scene);
+          setTimeout(() => {
+            inventario2.speed = 0.1;
+            console.log("Speed Up terminado");
+          }, 8000);
+        } 
+        else if (powerUp.type === 'pan') {
+          inventario2.manosCalientes = true;
+          powerUp.RemoveFromScene(scene);
+          setTimeout(() => {
+            inventario2.manosCalientes = false;
+            console.log("Manos calientes terminado");
+          }, 8000);
+        }
+        else if (powerUp.type === 'time') {
+          pause = true;
+          powerUp.RemoveFromScene(scene);
+          setTimeout(() => {
+            pause = false;
+            console.log("Tiempo extra terminado");
+          }, 8000);
+
+        }
+
+      }
+
 
       //segunda estufa     
       if (SelectedMap == 3) {
@@ -421,6 +536,9 @@ $(document).ready(function () {
   // Función de animación para mover los chefs
   function animate() {
 
+    speed = inventario.speed;
+    speed2 = inventario2.speed;
+
     // Movimiento del chef con W, A, S, D
     if (keysPressed['a'] && canMove(chef, { x: -speed, z: 0 })) {
       chef.PosX -= speed;
@@ -444,23 +562,23 @@ $(document).ready(function () {
 
     // Movimiento del chef2 con las flechas
 
-    if (keysPressed['arrowleft'] && canMove(chef2, { x: -speed, z: 0 })) {
-      chef2.PosX -= speed;
+    if (keysPressed['arrowleft'] && canMove(chef2, { x: -speed2, z: 0 })) {
+      chef2.PosX -= speed2;
       chef2.SetPositionThis();
     }
 
-    if (keysPressed['arrowright'] && canMove(chef2, { x: speed, z: 0 })) {
-      chef2.PosX += speed;
+    if (keysPressed['arrowright'] && canMove(chef2, { x: speed2, z: 0 })) {
+      chef2.PosX += speed2;
       chef2.SetPositionThis();
     }
 
-    if (keysPressed['arrowup'] && canMove(chef2, { x: 0, z: -speed })) {
-      chef2.PosZ -= speed;
+    if (keysPressed['arrowup'] && canMove(chef2, { x: 0, z: -speed2 })) {
+      chef2.PosZ -= speed2;
       chef2.SetPositionThis();
     }
 
-    if (keysPressed['arrowdown'] && canMove(chef2, { x: 0, z: speed })) {
-      chef2.PosZ += speed;
+    if (keysPressed['arrowdown'] && canMove(chef2, { x: 0, z: speed2 })) {
+      chef2.PosZ += speed2;
       chef2.SetPositionThis();
     }
 
@@ -485,6 +603,13 @@ $(document).ready(function () {
       stoveBurned.Update();
       stoveRaw.Update();
       stoveMeat.Update();
+
+      if(powerUp){
+        powerUp.Update();
+      }
+      
+      //boots.Update(); 
+      //pan.Update();
 
     }
 
@@ -518,6 +643,9 @@ $(document).ready(function () {
       stoveMeat2.Update();
       trash2.Update();
 
+      if(powerUp){
+        powerUp.Update();
+      }
     }
 
     // Cambiar el estado de la ESTUFA 1 ------
@@ -736,8 +864,8 @@ function MapaRestaurant() {
 
   stove = new CargarModelo('Models/stove/stove', manager, scene);
   stove.SetPosition(-4.95, 0, 2.4);
-  const axis = { x: 0, y: 1, z: 0 };
-  const angle = Math.PI / 2;
+  axis = { x: 0, y: 1, z: 0 };
+  angle = Math.PI / 2;
   stove.Rotate(axis, angle);
   stove.Scale(1.6, 1.6, 1.6)
   //stove.AddToScene(scene);
@@ -824,6 +952,17 @@ function MapaRestaurant() {
   bigtable2.AddToScene(scene);
   bigtable2.Scale(1.5, 1.5, 1.5);
 
+
+  axis = { x: 0, y: 1, z: 0 };
+  angle = Math.PI;
+
+  boots = new CargarModelo('Models/boots/boots', manager, scene);
+  boots.SetPosition(-5, 0, 2.5);
+  axis = { x: 0, y: 1, z: 0 };
+  angle = Math.PI;
+  boots.Rotate(axis, angle);
+  boots.AddToScene(scene);
+  boots.Scale(1, 1, 1);
 
   const spotLight = new THREE.SpotLight(0xffec77, 10); // Luz blanca con intensidad 1
   spotLight.position.set(4, 3, 0.4); // Posicionar la luz en las coordenadas especificadas
@@ -954,6 +1093,21 @@ function MapaChristmas() {
   spotLight.distance = 10; // Distancia máxima de la luz
   spotLight.castShadow = true; // Habilitar sombras (si las usas)
 
+  axis = { x: 0, y: 1, z: 0 };
+  angle = Math.PI/4;
+
+  // boots = new CargarModelo('Models/boots/boots', manager, scene);
+  // boots.SetPosition(-2, 0, 2);
+  // boots.Rotate(axis, angle);  
+  // boots.AddToScene(scene);
+  // boots.Scale(1, 1, 1);
+
+  // pan = new CargarModelo('Models/pan/pan', manager, scene);
+  // pan.SetPosition(2, 0, 1.5);
+  // pan.AddToScene(scene);
+  // pan.Scale(.7, .7, .7);
+
+
   // Opcional: Helper para visualizar la dirección de la luz
   //const spotLightHelper = new THREE.SpotLightHelper(spotLight);
   //scene.add(spotLightHelper);
@@ -989,12 +1143,12 @@ function MapaCrustacio() {
   trash.AddToScene(scene);
 
   deliver2 = new CargarModelo('Models/deliver/deliver', manager, scene);
-  deliver2.SetPosition(7, 0, 2.5);
+  deliver2.SetPosition(7, 0, 2.7);
   deliver2.AddToScene(scene);
   deliver2.Scale(1.45, 1.4, 1.4);
 
   deliver = new CargarModelo('Models/deliver/deliver', manager, scene);
-  deliver.SetPosition(-7, 0, 2.5);
+  deliver.SetPosition(-7, 0, 2.7);
   const axis = { x: 0, y: 1, z: 0 };
   const angle = Math.PI;
   deliver.Rotate(axis, angle);
@@ -1032,23 +1186,23 @@ function MapaCrustacio() {
   table2.Scale(1.5, 1.4, 1.2)
 
   stove2 = new CargarModelo('Models/stove/stove', manager, scene);
-  stove2.SetPosition(4.1, 0, 4.8)
+  stove2.SetPosition(4.1, 0, 4.7)
   stove2.Scale(1.6, 1.5, 1.5)
   stove2.Rotate(axis, angle);
   stove2.AddToScene(scene);
 
   stoveBurned2 = new CargarModelo('Models/stove/burned/stoveAndMeatBurned', manager, scene);
-  stoveBurned2.SetPosition(4.1, 0, 4.8)
+  stoveBurned2.SetPosition(4.1, 0, 4.7)
   stoveBurned2.Scale(1.6, 1.5, 1.5)
   stoveBurned2.Rotate(axis, angle);
 
   stoveRaw2 = new CargarModelo('Models/stove/raw/stoveAndMeatRaw', manager, scene);
-  stoveRaw2.SetPosition(4.1, 0, 4.8)
+  stoveRaw2.SetPosition(4.1, 0, 4.7)
   stoveRaw2.Scale(1.6, 1.5, 1.5)
   stoveRaw2.Rotate(axis, angle);
 
   stoveMeat2 = new CargarModelo('Models/stove/done/stoveAndMeat', manager, scene);
-  stoveMeat2.SetPosition(4.1, 0, 4.8)
+  stoveMeat2.SetPosition(4.1, 0, 40.7)
   stoveMeat2.Scale(1.6, 1.5, 1.5)
   stoveMeat2.Rotate(axis, angle);
 
@@ -1253,6 +1407,13 @@ function generateRandomOrder() {
 
 }
 
+function updateOrderInterval() {
+  if (orderInterval) {
+    clearInterval(orderInterval);
+  }
+  orderInterval = setInterval(generateRandomOrder, TimeOrders);
+}
+
 function togglePause() {
   pause = !pause;
   console.log(pause ? "Juego pausado" : "Juego reanudado");
@@ -1271,12 +1432,14 @@ function compareOrder(inventory, order) {
 }
 
 function checkDelivery(inventory) {
+  console.log(inventory);
   for (let i = currentOrders.length - 1; i >= 0; i--) {
     if (compareOrder(inventory, currentOrders[i])) {
       const orderId = currentOrders[i].id; // Guarda el ID antes de eliminar
       console.log('Orden cumplida:', currentOrders[i]);
       Score += 10;
       updateScore(Score);
+      updateTimeOrdersBasedOnScore();
       currentOrders.splice(i, 1); // Elimina la orden cumplida
       removeOrder(orderId); // Elimina la imagen asociada
       return true; // Detiene la función si cumple con una orden
@@ -1341,4 +1504,46 @@ function gameOver() {
 
 function updateScore(newScore) {
   $('#score-value').text(newScore); // Actualiza el texto en la card
+}
+
+function generateRandomPowerUp() {
+  const randomPowerUpIndex = Math.floor(Math.random() * powerUps.length);
+  const randomPowerUp = powerUps[randomPowerUpIndex];
+
+  const randomPositionIndex = Math.floor(Math.random() * possiblePositions.length);
+  const randomPosition = possiblePositions[randomPositionIndex];
+
+  const powerUp = new CargarModelo(randomPowerUp.modelPath, manager, scene);
+  powerUp.SetPosition(randomPosition.x, randomPosition.y, randomPosition.z);
+  powerUp.AddToScene(scene);
+  powerUp.type = randomPowerUp.type; // Asegúrate de que la propiedad type esté definida
+
+  isPowerUp = true;
+  console.log('Power-up generado:', randomPowerUp);
+
+  // Configurar un temporizador para eliminar el power-up después de 5 segundos si no es recogido
+  setTimeout(() => {
+    
+      powerUp.RemoveFromScene(scene);
+      console.log('Power-up eliminado después de 5 segundos:', randomPowerUp);
+      isPowerUp = false;
+    
+  }, 5000);
+
+  return powerUp;
+}
+
+function updateTimeOrdersBasedOnScore() {
+  if (Dificulty == 2) {
+    if (Score == 20) {
+      TimeOrders = 8000; // Disminuir el tiempo a 8 segundos
+    } else if (Score == 40) {
+      TimeOrders = 6000; // Dismiwnuir el tiempo a 6 segundos
+    } else if (Score == 60) {
+      TimeOrders = 4000; // Disminuir el tiempo a 4 segundos
+    }
+  } else {
+    TimeOrders = 10000; // Mantener el tiempo en 10 segundos si la dificultad no es 2
+  }
+  updateOrderInterval(); // Actualizar el intervalo de generación de órdenes
 }

@@ -14,6 +14,8 @@ export class Inventario {
     this.soda = false;
 
     this.manosCalientes = false;
+    this.speed = 0.1;
+    this.timeStoper = false;
   }
 
   
@@ -185,17 +187,17 @@ export class Inventario {
   }
 
   getRawMeat(){
-    
-    if(this.soda){
+    if(this.manosCalientes){  
+      console.log("Manos calientes");
+      return this.getDoneMeat();
+    }
+    else if(this.soda){
       console.log("Manos llenas");
+      return '';
     }
     else if(this.tomate || this.letuce || this.bread || this.hamburguer){
-      if(this.manosCalientes){  
-        console.log("Manos calientes");
-        this.makeHamburger();
-        return "Inventory/All.png";
-      }
       console.log("No puedes agregar carne cruda a la hamburguesa");
+      return '';
     }
     else {
       console.log("Carne cruda");
@@ -236,7 +238,12 @@ export class Inventario {
         console.log("carne cocinada, tomate y pan");
         
         return "Inventory/pan_tom_carne.png";
-      }      
+      }  
+      else if(this.donemeat && this.letuce && this.bread){
+        console.log("carne cocinada, lechuga y pan");
+        
+        return "Inventory/pan_lec_carne.png";
+      }       
       else if(this.donemeat && this.bread){
         console.log("carne cocinada y pan");
         
@@ -378,7 +385,6 @@ export class Inventario {
       return true;
     }
   }
-
 
 
 }
