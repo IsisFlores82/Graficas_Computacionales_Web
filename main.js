@@ -6,6 +6,85 @@ import { Inventario } from './Inventario.js';
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/MTLLoader.js';
 
+// Inicializa la conexión al servidor de Socket.IO
+// Conexión al servidor de Socket.IO
+const socket = io();
+let localPlayer = null; // Jugador local
+let otherPlayer = null; // Jugador remoto
+const playerName = localStorage.getItem("playerName");
+
+// Crear jugador local
+function createLocalPlayer(data) {
+  console.log("[DEBUG] Creando jugador local con datos:", data);
+  localPlayer = new CargarModelo('Models/chef/chef', manager, scene);
+  localPlayer.name = data.name;
+  localPlayer.PosX = data.PosX;
+  localPlayer.PosZ = data.PosZ;
+  localPlayer.SetPositionThis();
+  localPlayer.SetPosition(data.PosX, data.PosY, data.PosZ);
+  localPlayer.AddToScene(scene);
+  console.log("[DEBUG] Jugador local creado:", localPlayer);
+}
+
+// Crear jugador remoto
+function createOtherPlayer(data) {
+  console.log("[DEBUG] Creando jugador remoto con datos:", data);
+  otherPlayer = new CargarModelo('Models/chef2/chef2', manager, scene);
+  otherPlayer.name = data.name;
+  otherPlayer.PosX = data.PosX;
+  otherPlayer.PosZ = data.PosZ;
+  otherPlayer.SetPositionThis();
+  otherPlayer.SetPosition(data.PosX, data.PosY, data.PosZ);
+  otherPlayer.AddToScene(scene);
+  console.log("[DEBUG] Jugador remoto creado:", otherPlayer);
+}
+
+// Manejar conexión al servidor
+socket.on('connect', () => {
+  console.log("[DEBUG] Conectado al servidor...");
+
+  // Emitir evento para registrar al jugador local
+  socket.emit('Iniciar', playerName);
+});
+
+// Manejar lista inicial de jugadores
+socket.on('ListaJugadores', (players) => {
+  console.log("[DEBUG] Lista de jugadores recibida:", players);
+
+  // Crear jugador local
+  const localData = players.find((player) => player.socketId === socket.id);
+  if (localData) {
+    createLocalPlayer(localData);
+  }
+
+  // Crear jugador remoto si existe
+  const remoteData = players.find((player) => player.socketId !== socket.id);
+  if (remoteData) {
+    createOtherPlayer(remoteData);
+  }
+});
+
+// Manejar nuevo jugador conectado
+socket.on('JugadorConectado', (player) => {
+  console.log("[DEBUG] Nuevo jugador conectado:", player);
+
+  // Crear al jugador remoto si aún no existe
+  if (!otherPlayer) {
+    createOtherPlayer(player);
+  }
+});
+
+// Manejar desconexión de un jugador
+socket.on('JugadorDesconectado', (data) => {
+  console.log("[DEBUG] Jugador desconectado:", data);
+
+  if (otherPlayer && otherPlayer.name === data.name) {
+    scene.remove(otherPlayer); // Remover al jugador remoto de la escena
+    otherPlayer = null;
+    console.log("[DEBUG] Jugador remoto eliminado.");
+  }
+});
+
 const world = new CANNON.World();
 world.gravity.set(0, -9.82, 0);
 
@@ -183,91 +262,91 @@ $(document).ready(function () {
     if (e.key.toLowerCase() === 'e') {
 
       //si estas colisionandon con la estufa y el tomate a la vez, se le da prioridad al tomate
-      if (isCollision(chef, tomato) && isCollision(chef, stoveBurned)) {
+      if (isCollision(localPlayer, tomato) && isCollision(localPlayer, stoveBurned)) {
 
-        if (isCollision(chef, tomato)) {
-          console.log("Colisión detectada entre el chef y el tomate");
+        if (isCollision(localPlayer, tomato)) {
+          console.log("Colisión detectada entre el localPlayer y el tomate");
           imgInventario = inventario.getTomate();
         }
 
       }
 
-      if (isCollision(chef, letuce) && isCollision(chef, stoveMeat)) {
+      if (isCollision(localPlayer, letuce) && isCollision(localPlayer, stoveMeat)) {
 
-        if (isCollision(chef, letuce)) {
-          console.log("Colisión detectada entre el chef y la lechuga");
+        if (isCollision(localPlayer, letuce)) {
+          console.log("Colisión detectada entre el localPlayer y la lechuga");
           // Lógica para recoger la entrega
           imgInventario = inventario.getLetuce();
         }
 
       }
 
-      if (isCollision(chef, tomato)) {
-        console.log("Colisión detectada entre el chef y el tomate");
+      if (isCollision(localPlayer, tomato)) {
+        console.log("Colisión detectada entre el localPlayer y el tomate");
         imgInventario = inventario.getTomate();
       }
 
-      if (isCollision(chef, meat)) {
-        console.log("Colisión detectada entre el chef y carne");
+      if (isCollision(localPlayer, meat)) {
+        console.log("Colisión detectada entre el localPlayer y carne");
         // Lógica para recoger la carne
         imgInventario = inventario.getRawMeat();
       }
 
-      if (isCollision(chef, deliver)) {
-        console.log("Colisión detectada entre el chef y la entrega");
+      if (isCollision(localPlayer, deliver)) {
+        console.log("Colisión detectada entre el localPlayer y la entrega");
 
         checkDelivery(inventario);
         imgInventario = inventario.completeOrder();
       }
 
-      if (isCollision(chef, letuce)) {
-        console.log("Colisión detectada entre el chef y la lechuga");
+      if (isCollision(localPlayer, letuce)) {
+        console.log("Colisión detectada entre el localPlayer y la lechuga");
         // Lógica para recoger la entrega
         imgInventario = inventario.getLetuce();
       }
 
-      if (isCollision(chef, bread)) {
-        console.log("Colisión detectada entre el chef y el pan");
+      if (isCollision(localPlayer, bread)) {
+        console.log("Colisión detectada entre el localPlayer y el pan");
         // Lógica para recoger la entrega
         imgInventario = inventario.getBread();
       }
 
-      if (isCollision(chef, trash)) {
-        console.log("Colisión detectada entre el chef y la basura");
+      if (isCollision(localPlayer, trash)) {
+        console.log("Colisión detectada entre el localPlayer y la basura");
         // Lógica para recoger la entrega
         imgInventario = inventario.trash();
       }
 
-      if (isCollision(chef, soda)) {
-        console.log("Colisión detectada entre el chef2 y la soda2");
+      if (isCollision(localPlayer, soda)) {
+        console.log("Colisión detectada entre el localPlayer y la soda2");
         // Lógica para recoger la entrega
         imgInventario = inventario.getSoda();
       }
 
       //pone a cocinar la carne cruda
-      if (isCollision(chef, stove) && stoveState == 1 && inventario.rawmeat) {
-        console.log("Colisión detectada entre el chef y la estufa");
+      if (isCollision(localPlayer, stove) && stoveState == 1 && inventario.rawmeat) {
+        console.log("Colisión detectada entre el localPlayer y la estufa");
         // Lógica para recoger la entrega
         imgInventario = inventario.trash();
         stoveState = 2; //cruda cocinando
         startCronometro(4000);
 
       }
-      if (isCollision(chef, stove) && stoveState == 2) {    // && inventario.isInventoryEmpty()
-        console.log("Colisión detectada entre el chef y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
+      if (isCollision(localPlayer, stove) && stoveState == 2) {    // && inventario.isInventoryEmpty()
+        console.log("Colisión detectada entre el localPlayer y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
         console.log("La carne se esta cocinando, espera un momento");
       }
 
-      if (isCollision(chef, stove) && stoveState == 3) {   // para recoger la carne cocida
-        console.log("Colisión detectada entre el chef y la estufa con carne cocida");
+      if (isCollision(localPlayer, stove) && stoveState == 3) {   // para recoger la carne cocida
+        console.log("Colisión detectada entre el localPlayer y la estufa con carne cocida");
         // Lógica para recoger la entrega
         imgInventario = inventario.getDoneMeat();
         stoveState = 1; //vaciar la estufa
         stopCronometro();
       }
 
-      if (isCollision(chef, stove) && stoveState == 4 && inventario.isInventoryEmpty()) {    //para recoger la carne quemada
-        console.log("Colisión detectada entre el chef y la estufa con carne quemada");
+      if (isCollision(localPlayer, stove) && stoveState == 4 && inventario.isInventoryEmpty()) {    //para recoger la carne quemada
+        console.log("Colisión detectada entre el localPlayer y la estufa con carne quemada");
         // Lógica para recoger la entrega
         imgInventario = inventario.getBurnedMeat();
         stoveState = 1; //vaciar la estufa
@@ -275,8 +354,8 @@ $(document).ready(function () {
       }
 
 
-      if (powerUp && isCollision(chef, powerUp) && isPowerUp) {
-        console.log(`Colisión detectada entre el chef y el ${powerUp.type}`);
+      if (powerUp && isCollision(localPlayer, powerUp) && isPowerUp) {
+        console.log(`Colisión detectada entre el localPlayer y el ${powerUp.type}`);
         
         if (powerUp.type === 'boots') {
           inventario.speed = 0.2;
@@ -318,98 +397,98 @@ $(document).ready(function () {
     if (e.key.toLowerCase() === '0') {
 
       //si estas colisionandon con la estufa y el tomate a la vez, se le da prioridad al tomate
-      if (isCollision(chef2, tomato) && isCollision(chef2, stoveBurned)) {
+      if (isCollision(otherPlayer, tomato) && isCollision(otherPlayer, stoveBurned)) {
 
-        if (isCollision(chef2, tomato)) {
-          console.log("Colisión detectada entre el chef2 y el tomate");
+        if (isCollision(otherPlayer, tomato)) {
+          console.log("Colisión detectada entre el otherPlayer y el tomate");
           imgInventario2 = inventario2.getTomate();
         }
 
       }
 
-      if (isCollision(chef2, letuce) && isCollision(chef2, stoveMeat)) {
+      if (isCollision(otherPlayer, letuce) && isCollision(otherPlayer, stoveMeat)) {
 
-        if (isCollision(chef2, letuce)) {
-          console.log("Colisión detectada entre el chef2 y la lechuga");
+        if (isCollision(otherPlayer, letuce)) {
+          console.log("Colisión detectada entre el otherPlayer y la lechuga");
           // Lógica para recoger la entrega
           imgInventario2 = inventario2.getLetuce();
         }
 
       }
 
-      if (isCollision(chef2, tomato)) {
-        console.log("Colisión detectada entre el chef2 y el tomate");
+      if (isCollision(otherPlayer, tomato)) {
+        console.log("Colisión detectada entre el otherPlayer y el tomate");
         imgInventario2 = inventario2.getTomate();
       }
 
-      if (isCollision(chef2, meat)) {
-        console.log("Colisión detectada entre el chef2 y carne");
+      if (isCollision(otherPlayer, meat)) {
+        console.log("Colisión detectada entre el otherPlayer y carne");
         // Lógica para recoger la carne
         imgInventario2 = inventario2.getRawMeat();
       }
 
-      if (isCollision(chef2, deliver2)) {
-        console.log("Colisión detectada entre el chef2 y la entrega");
+      if (isCollision(otherPlayer, deliver2)) {
+        console.log("Colisión detectada entre el otherPlayer y la entrega");
 
         checkDelivery(inventario2);
         imgInventario2 = inventario2.completeOrder();
       }
 
-      if (isCollision(chef2, letuce)) {
-        console.log("Colisión detectada entre el chef2 y la lechuga");
+      if (isCollision(otherPlayer, letuce)) {
+        console.log("Colisión detectada entre el otherPlayer y la lechuga");
         // Lógica para recoger la entrega
         imgInventario2 = inventario2.getLetuce();
       }
 
-      if (isCollision(chef2, bread)) {
-        console.log("Colisión detectada entre el chef2 y el pan");
+      if (isCollision(otherPlayer, bread)) {
+        console.log("Colisión detectada entre el otherPlayer y el pan");
         // Lógica para recoger la entrega
         imgInventario2 = inventario2.getBread();
       }
 
-      if (isCollision(chef2, trash)) {
-        console.log("Colisión detectada entre el chef2 y la basura");
+      if (isCollision(otherPlayer, trash)) {
+        console.log("Colisión detectada entre el otherPlayer y la basura");
         // Lógica para recoger la entrega
         imgInventario2 = inventario2.trash();
       }
 
-      if (isCollision(chef2, soda)) {
-        console.log("Colisión detectada entre el chef2 y la soda2");
+      if (isCollision(otherPlayer, soda)) {
+        console.log("Colisión detectada entre el otherPlayer y la soda2");
         // Lógica para recoger la entrega
         imgInventario2 = inventario2.getSoda();
       }
 
       //pone a cocinar la carne cruda
-      if (isCollision(chef2, stove) && stoveState == 1 && inventario2.rawmeat) {
-        console.log("Colisión detectada entre el chef2 y la estufa");
+      if (isCollision(otherPlayer, stove) && stoveState == 1 && inventario2.rawmeat) {
+        console.log("Colisión detectada entre el otherPlayer y la estufa");
         // Lógica para recoger la entrega
         imgInventario2 = inventario2.trash();
         stoveState = 2; //cruda cocinando
         startCronometro(4000);
       }
 
-      if (isCollision(chef2, stove) && stoveState == 2) {    // && inventario.isInventoryEmpty()
-        console.log("Colisión detectada entre el chef2 y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
+      if (isCollision(otherPlayer, stove) && stoveState == 2) {    // && inventario.isInventoryEmpty()
+        console.log("Colisión detectada entre el otherPlayer y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
         console.log("La carne se esta cocinando, espera un momento");
       }
 
-      if (isCollision(chef2, stove) && stoveState == 3) {   // para recoger la carne cocida
-        console.log("Colisión detectada entre el chef2 y la estufa con carne cocida");
+      if (isCollision(otherPlayer, stove) && stoveState == 3) {   // para recoger la carne cocida
+        console.log("Colisión detectada entre el otherPlayer y la estufa con carne cocida");
         // Lógica para recoger la entrega
         imgInventario2 = inventario2.getDoneMeat();
         stoveState = 1; //vaciar la estufa
         stopCronometro();
       }
 
-      if (isCollision(chef2, stove) && stoveState == 4 && inventario2.isInventoryEmpty()) {    //para recoger la carne quemada
-        console.log("Colisión detectada entre el chef2 y la estufa con carne quemada");
+      if (isCollision(otherPlayer, stove) && stoveState == 4 && inventario2.isInventoryEmpty()) {    //para recoger la carne quemada
+        console.log("Colisión detectada entre el otherPlayer y la estufa con carne quemada");
         // Lógica para recoger la entrega
         imgInventario2 = inventario2.getBurnedMeat();
         stoveState = 1; //vaciar la estufa
       }
 
-      if (powerUp && isCollision(chef2, powerUp) && isPowerUp) {
-        console.log(`Colisión detectada entre el chef y el ${powerUp.type}`);
+      if (powerUp && isCollision(otherPlayer, powerUp) && isPowerUp) {
+        console.log(`Colisión detectada entre el localPlayer y el ${powerUp.type}`);
         
         if (powerUp.type === 'boots') {
           inventario2.speed = 0.2;
@@ -443,52 +522,52 @@ $(document).ready(function () {
       //segunda estufa     
       if (SelectedMap == 3) {
 
-        if (isCollision(chef2, letuce2)) {
-          console.log("Colisión detectada entre el chef2 y la lechuga2");
+        if (isCollision(otherPlayer, letuce2)) {
+          console.log("Colisión detectada entre el otherPlayer y la lechuga2");
           imgInventario2 = inventario2.getLetuce();
         }
-        if (isCollision(chef2, bread2)) {
-          console.log("Colisión detectada entre el chef2 y el pan2");
+        if (isCollision(otherPlayer, bread2)) {
+          console.log("Colisión detectada entre el otherPlayer y el pan2");
           imgInventario2 = inventario2.getBread();
         }
-        if (isCollision(chef2, soda2)) {
-          console.log("Colisión detectada entre el chef2 y la soda2");
+        if (isCollision(otherPlayer, soda2)) {
+          console.log("Colisión detectada entre el otherPlayer y la soda2");
           imgInventario2 = inventario2.getSoda();
         }
-        if (isCollision(chef2, deliver2)) {
-          console.log("Colisión detectada entre el chef2 y la entrega2");
+        if (isCollision(otherPlayer, deliver2)) {
+          console.log("Colisión detectada entre el otherPlayer y la entrega2");
           imgInventario2 = inventario2.completeOrder();
         }
-        if (isCollision(chef2, trash2)) {
-          console.log("Colisión detectada entre el chef2 y la basura2");
+        if (isCollision(otherPlayer, trash2)) {
+          console.log("Colisión detectada entre el otherPlayer y la basura2");
           imgInventario2 = inventario2.trash();
         }
 
 
         //pone a cocinar la carne cruda
-        if (isCollision(chef2, stove2) && stoveState2 == 1 && inventario2.rawmeat) {
-          console.log("Colisión detectada entre el chef2 y la estufa2");
+        if (isCollision(otherPlayer, stove2) && stoveState2 == 1 && inventario2.rawmeat) {
+          console.log("Colisión detectada entre el otherPlayer y la estufa2");
           // Lógica para recoger la entrega
           imgInventario2 = inventario2.trash();
           stoveState2 = 2; //cruda cocinando
           startCronometro2(4000);
 
         }
-        if (isCollision(chef2, stove2) && stoveState2 == 2) {    // && inventario.isInventoryEmpty()
-          console.log("Colisión detectada entre el chef2 y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
+        if (isCollision(otherPlayer, stove2) && stoveState2 == 2) {    // && inventario.isInventoryEmpty()
+          console.log("Colisión detectada entre el otherPlayer y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
           console.log("La carne se esta cocinando, espera un momento");
         }
 
-        if (isCollision(chef2, stove2) && stoveState2 == 3) {   // para recoger la carne cocida
-          console.log("Colisión detectada entre el chef2 y la estufa con carne cocida");
+        if (isCollision(otherPlayer, stove2) && stoveState2 == 3) {   // para recoger la carne cocida
+          console.log("Colisión detectada entre el otherPlayer y la estufa con carne cocida");
           // Lógica para recoger la entrega
           imgInventario2 = inventario2.getDoneMeat();
           stoveState2 = 1; //vaciar la estufa
           stopCronometro();
         }
 
-        if (isCollision(chef2, stove2) && stoveState2 == 4 && inventario.isInventoryEmpty()) {    //para recoger la carne quemada
-          console.log("Colisión detectada entre el chef2 y la estufa con carne quemada");
+        if (isCollision(otherPlayer, stove2) && stoveState2 == 4 && inventario.isInventoryEmpty()) {    //para recoger la carne quemada
+          console.log("Colisión detectada entre el otherPlayer y la estufa con carne quemada");
           // Lógica para recoger la entrega
           imgInventario2 = inventario2.getBurnedMeat();
           stoveState2 = 1; //vaciar la estufa
@@ -540,47 +619,46 @@ $(document).ready(function () {
     speed2 = inventario2.speed;
 
     // Movimiento del chef con W, A, S, D
-    if (keysPressed['a'] && canMove(chef, { x: -speed, z: 0 })) {
-      chef.PosX -= speed;
-      chef.SetPositionThis();
+    if (keysPressed['a'] && canMove(localPlayer, { x: -speed, z: 0 })) {
+      localPlayer.PosX -= speed;
     }
 
-    if (keysPressed['d'] && canMove(chef, { x: speed, z: 0 })) {
-      chef.PosX += speed;
-      chef.SetPositionThis();
+    if (keysPressed['d'] && canMove(localPlayer, { x: speed, z: 0 })) {
+      localPlayer.PosX += speed;
+      localPlayer.SetPositionThis();
     }
 
-    if (keysPressed['w'] && canMove(chef, { x: 0, z: -speed })) {
-      chef.PosZ -= speed;
-      chef.SetPositionThis();
+    if (keysPressed['w'] && canMove(localPlayer, { x: 0, z: -speed })) {
+      localPlayer.PosZ -= speed;
+      localPlayer.SetPositionThis();
     }
 
-    if (keysPressed['s'] && canMove(chef, { x: 0, z: speed })) {
-      chef.PosZ += speed;
-      chef.SetPositionThis();
+    if (keysPressed['s'] && canMove(localPlayer, { x: 0, z: speed })) {
+      localPlayer.PosZ += speed;
+      localPlayer.SetPositionThis();
     }
 
-    // Movimiento del chef2 con las flechas
+    // // Movimiento del chef2 con las flechas
 
-    if (keysPressed['arrowleft'] && canMove(chef2, { x: -speed2, z: 0 })) {
-      chef2.PosX -= speed2;
-      chef2.SetPositionThis();
-    }
+    // if (keysPressed['arrowleft'] && canMove(chef2, { x: -speed2, z: 0 })) {
+    //   chef2.PosX -= speed2;
+    //   chef2.SetPositionThis();
+    // }
 
-    if (keysPressed['arrowright'] && canMove(chef2, { x: speed2, z: 0 })) {
-      chef2.PosX += speed2;
-      chef2.SetPositionThis();
-    }
+    // if (keysPressed['arrowright'] && canMove(chef2, { x: speed2, z: 0 })) {
+    //   chef2.PosX += speed2;
+    //   chef2.SetPositionThis();
+    // }
 
-    if (keysPressed['arrowup'] && canMove(chef2, { x: 0, z: -speed2 })) {
-      chef2.PosZ -= speed2;
-      chef2.SetPositionThis();
-    }
+    // if (keysPressed['arrowup'] && canMove(chef2, { x: 0, z: -speed2 })) {
+    //   chef2.PosZ -= speed2;
+    //   chef2.SetPositionThis();
+    // }
 
-    if (keysPressed['arrowdown'] && canMove(chef2, { x: 0, z: speed2 })) {
-      chef2.PosZ += speed2;
-      chef2.SetPositionThis();
-    }
+    // if (keysPressed['arrowdown'] && canMove(chef2, { x: 0, z: speed2 })) {
+    //   chef2.PosZ += speed2;
+    //   chef2.SetPositionThis();
+    // }
 
     //Mapa Navidad y Restaurante
     if (SelectedMap == 2 || SelectedMap == 1) {
@@ -592,7 +670,7 @@ $(document).ready(function () {
       stove.Update();
       bigtable2.Update();
       bigtable3.Update();
-      chef.Update();
+      localPlayer.Update();
 
       bigtable.Update();
       table.Update();
@@ -632,8 +710,12 @@ $(document).ready(function () {
       table4.Update();
       bigtable.Update();
       bigtable3.Update();
-      chef.Update();
-
+      console.log("Estado de localPlayer en animate:", localPlayer); 
+      if(localPlayer){
+      localPlayer.Update();
+      }else{
+        console.log("localPlayer no existe");
+      }
       trash.Update();
       stoveBurned.Update();
       stoveBurned2.Update();
@@ -717,9 +799,17 @@ $(document).ready(function () {
         stoveBurned2.AddToScene(scene);
       }
     }
-
-    chef.Update();
-    chef2.Update();
+    if(localPlayer){
+    localPlayer.Update();
+    updateServerPosition();
+    }else{
+      console.log("localPlayer sigue sin estar creado");
+    }
+    if(otherPlayer){
+    otherPlayer.Update();
+    }else{
+      console.log("otherPlayer sigue sin estar creado");
+    }
 
     // Vuelve a llamar a la función en el siguiente cuadro    
     requestAnimationFrame(animate);
@@ -728,6 +818,30 @@ $(document).ready(function () {
 
   // Comienza la animación
   animate();
+});
+function updateServerPosition() {
+  if (localPlayer) {
+    socket.emit('PosicionActualizada', {
+      socketId: localPlayer.socketId,
+      name: localPlayer.name,
+      PosX: localPlayer.PosX,
+      PosY: localPlayer.PosY || 0, // Si no se usa la coordenada Y, envía 0 por defecto
+      PosZ: localPlayer.PosZ
+    });
+  }
+}
+
+socket.on('updatePlayerPosition', (data) => {
+  console.log('[DEBUG] Actualización de posición recibida:', data);
+
+  // Actualiza la posición del jugador remoto
+  if (otherPlayer && otherPlayer.name === data.name) {
+    otherPlayer.PosX = data.PosX;
+    otherPlayer.PosY = data.PosY;
+    otherPlayer.PosZ = data.PosZ;
+    otherPlayer.SetPositionThis();
+    console.log('[DEBUG] Posición del jugador remoto actualizada:', otherPlayer);
+  }
 });
 
 // Función para actualizar la imagen del invnetario
@@ -921,11 +1035,11 @@ function MapaRestaurant() {
   chef2.SetPosition(1, 0, 1);
   chef2.AddToScene(scene);
 
-  // chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
-  // chef2.PosX = 5;
-  // chef2.PosZ = 1;
-  // chef2.SetPosition(2, 0, 1);
-  // chef2.AddToScene(scene);
+  chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
+  chef2.PosX = 5;
+  chef2.PosZ = 1;
+  chef2.SetPosition(2, 0, 1);
+  chef2.AddToScene(scene);
 
   bigtable = new CargarModelo('Models/bigtable/bigtable', manager, scene);
   bigtable.SetPosition(-4.1, 0, 4)
@@ -1262,19 +1376,19 @@ function MapaCrustacio() {
   bigtable3.AddToScene(scene);
   bigtable3.Scale(.7, 1.6, 1.7);
 
-  chef = new CargarModelo('Models/chef/chef', manager, scene);
-  //chef.SetPosition(-3, 0, 2)
-  chef.PosX = -3;
-  chef.PosZ = 2;
-  chef.SetPositionThis();
-  chef.AddToScene(scene);
+  // chef = new CargarModelo('Models/chef/chef', manager, scene);
+  // //chef.SetPosition(-3, 0, 2)
+  // chef.PosX = -3;
+  // chef.PosZ = 2;
+  // chef.SetPositionThis();
+  // chef.AddToScene(scene);
 
-  chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
-  chef2.PosX = 3;
-  chef2.PosZ = 2;
-  chef2.SetPositionThis();
-  chef2.SetPosition(3, 0, 2);
-  chef2.AddToScene(scene);
+  // chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
+  // chef2.PosX = 3;
+  // chef2.PosZ = 2;
+  // chef2.SetPositionThis();
+  // chef2.SetPosition(3, 0, 2);
+  // chef2.AddToScene(scene);
 
   // Crear la luz spot
   const spotLight = new THREE.SpotLight(0xffec77, 10); // Luz blanca con intensidad 1

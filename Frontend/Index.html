@@ -11,8 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-  <link rel="stylesheet" href="Index.css">
+  <link rel="stylesheet" href="/Frontend/Index.css">
 
 </head>
 <!--NOTA DEL AUTOR: La actual imagen de fondo solo es place holder para que en un futuro esta bien el render, es solo temporal pq mi blender
@@ -22,7 +21,7 @@
 
   <div class="d-flex flex-column w-100 vh-100 align-items-center justify-content-center">
     <div class="image-text-container">
-      <img src="dish-dash-logo.jpeg" alt="DISH DASH!" class="background-image">
+      <img src="/Frontend/dish-dash-logo.jpeg" alt="DISH DASH!" class="background-image">
       <h1 class="parpadea principal-text">Presiona ENTER para continuar!</h1>
     </div>
 
@@ -33,7 +32,7 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-body-secondary">
           <div class="modal-header">
-            <img src="logo DD font.png" class="logo-small" alt="DISH DASH!">
+            <img src="/Frontend/logo DD font.png" class="logo-small" alt="DISH DASH!">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body d-flex flex-column align-items-center justify-content-center">
@@ -86,9 +85,8 @@
           <label for="mapSelect" class="form-label">Selecciona un Mapa</label>
           <select id="mapSelect" class="form-select" required>
             <option value="" disabled selected>Selecciona un mapa</option>
-            <option value="map1">Mapa 1</option>
-            <option value="map2">Mapa 2</option>
-            <option value="map3">Mapa 3</option>
+            <option value="1">Mapa 1</option>
+            <option value="2">Mapa 2</option>
           </select>
         </div>
 
@@ -97,17 +95,8 @@
           <label for="difficultySelect" class="form-label">Selecciona la Dificultad</label>
           <select id="difficultySelect" class="form-select" required>
             <option value="" disabled selected>Selecciona la dificultad</option>
-            <option value="easy">Fácil</option>
-            <option value="hard">Difícil</option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label for="gamemodeSelect" class="form-label">Selecciona el Modo de Juego</label>
-          <select id="gamemodeSelect" class="form-select" required>
-            <option value="" disabled selected>Selecciona el Modo de Juego</option>
-            <option value="Stage">Stage</option>
-            <option value="Infinito">Infinito</option>
+            <option value="1">Fácil</option>
+            <option value="2">Difícil</option>
           </select>
         </div>
 
@@ -120,7 +109,7 @@
         </div>
 
         <!-- Botón para Empezar Partida -->
-         <a href="../game.html" id="startGameButton" class="btn btn-secondary btn-orange w-100"> Empezar Partida </a>
+         <a href="/game.html" id="startGameButton" class="btn btn-secondary btn-orange w-100"> Empezar Partida </a>
         <!-- <button id="startGameButton" class="btn btn-secondary btn-orange w-100">Empezar Partida</button>-->
       </div>
     </div>
@@ -233,9 +222,7 @@
 
   </div>
 
-  
-  <script src="Index.js"></script>
-  <!-- Modal para Crear o Unirse a una Partida -->
+    <!-- Modal para Crear o Unirse a una Partida -->
 <div class="modal fade" id="Settings" tabindex="-1" aria-labelledby="SettingsMenu" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-body-secondary">
@@ -285,7 +272,27 @@
   </div>
 </div>
   
+<script> 
 
-<script src="Index.js"></script>
+// Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
+document.getElementById("BtnCreateGame").addEventListener("click", () => {
+  const playerName = document.getElementById("usernameInput").value;
+  console.log("Nombre del jugador:", playerName);
+  if (playerName) {
+    localStorage.setItem("playerName", playerName); // Guardar nombre en el navegador
+  }
+  
+});
+// Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
+document.getElementById("BtnSearchGame").addEventListener("click", () => {
+  const playerName = document.getElementById("usernameInput").value;
+  console.log("Nombre del jugador:", playerName);
+  if (playerName) {
+    localStorage.setItem("playerName", playerName); // Guardar nombre en el navegador
+  }
+  
+});
+</script>
+<script src="/Frontend/Index.js"></script>
 </body>
 </html>
