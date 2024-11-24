@@ -64,14 +64,16 @@
         </div>
 
         <!-- Botones para Crear o Unirse a una Partida -->
-        <button id="BtnCreateGame" class="btn btn-secondary btn-orange m-2">Crear Partida</button>
-        <button id="BtnSearchGame" class="btn btn-secondary btn-orange m-2">Buscar Partida</button>
+        <button  id="Coop11" class="btn btn-secondary btn-orange m-2">Cooperativo Facil</button>
+        <button  id="Coop22" class="btn btn-secondary btn-orange m-2">Cooperativo Dificil</button>
+        <button  id="VS31" class="btn btn-secondary btn-orange m-2">Multijugador Facil</button>
+        <button  id="VS32" class="btn btn-secondary btn-orange m-2">Multijugador Dificil</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal para Crear Partida -->
+<!-- Modal para Crear Partida
 <div class="modal fade" id="CreateGameModal" tabindex="-1" aria-labelledby="CreateGameLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-body-secondary">
@@ -80,7 +82,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Selección de Mapa -->
+        
         <div class="mb-3">
           <label for="mapSelect" class="form-label">Selecciona un Mapa</label>
           <select id="mapSelect" class="form-select" required>
@@ -90,7 +92,7 @@
           </select>
         </div>
 
-        <!-- Selección de Dificultad -->
+        
         <div class="mb-3">
           <label for="difficultySelect" class="form-label">Selecciona la Dificultad</label>
           <select id="difficultySelect" class="form-select" required>
@@ -100,24 +102,24 @@
           </select>
         </div>
 
-        <!-- Lista de Jugadores en la Sala -->
+        
         <div class="mb-3">
           <label class="form-label">Jugadores en la Sala</label>
           <ul id="playerList" class="list-group mb-3">
-            <!-- Se agregan los jugadores despues -->
+            
           </ul>
         </div>
 
-        <!-- Botón para Empezar Partida -->
+        
          <a href="/game.html" id="startGameButton" class="btn btn-secondary btn-orange w-100"> Empezar Partida </a>
-        <!-- <button id="startGameButton" class="btn btn-secondary btn-orange w-100">Empezar Partida</button>-->
+        
       </div>
     </div>
   </div>
 </div>
 
 
-<!-- Modal para Unirse a una Partida -->
+
 <div class="modal fade" id="JoinGameModal" tabindex="-1" aria-labelledby="JoinGameLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-body-secondary">
@@ -126,7 +128,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Lista de Partidas Disponibles -->
+        
         <div class="mb-3">
           <label class="form-label">Selecciona una Partida</label>
           <ul id="availableGamesList" class="list-group mb-3">
@@ -136,12 +138,12 @@
           </ul>
         </div>
 
-        <!-- Botón para Unirse a la Partida -->
+       
         <button id="joinGameButton" class="btn btn-secondary btn-orange w-100" disabled>Unirse</button>
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
     
     <!-- Leaderboard Modal -->
@@ -222,7 +224,7 @@
 
   </div>
 
-    <!-- Modal para Crear o Unirse a una Partida -->
+    <!-- Modal para Settings -->
 <div class="modal fade" id="Settings" tabindex="-1" aria-labelledby="SettingsMenu" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-body-secondary">
@@ -253,7 +255,7 @@
           <span id="volumeValue3" class="volume-value">50%</span>
         </div>
         <br>
-        <label for="resolution" class="resolucionlabel">Resolución de pantalla</label>
+        <!-- <label for="resolution" class="resolucionlabel">Resolución de pantalla</label>
         <br>
         <div class="container-mt-5">          
           <div class="btn-group" role="group" aria-label="Selector">
@@ -266,7 +268,7 @@
             <input type="radio" class="btn-check" name="options" id="alta" autocomplete="off">
             <label class="btn btn-outline-custom" for="alta">Alta</label>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -275,20 +277,49 @@
 <script> 
 
 // Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
-document.getElementById("BtnCreateGame").addEventListener("click", () => {
+document.getElementById("Coop11").addEventListener("click", () => {
+  const playerName = document.getElementById("usernameInput").value;
+  console.log("Nombre del jugador:", playerName);
+  if (playerName) {
+    localStorage.setItem("playerName", playerName);
+    localStorage.setItem("Dificulty", 1); 
+    localStorage.setItem("Map", 1); 
+  }
+  
+
+ 
+
+});
+// Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
+document.getElementById("Coop22").addEventListener("click", () => {
   const playerName = document.getElementById("usernameInput").value;
   console.log("Nombre del jugador:", playerName);
   if (playerName) {
     localStorage.setItem("playerName", playerName); // Guardar nombre en el navegador
+    localStorage.setItem("dificulty", 2); 
+    localStorage.setItem("Map", 2); 
   }
   
 });
 // Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
-document.getElementById("BtnSearchGame").addEventListener("click", () => {
+document.getElementById("VS31").addEventListener("click", () => {
+  const playerName = document.getElementById("usernameInput").value;
+  console.log("Nombre del jugador:", playerName);
+  if (playerName) {
+    localStorage.setItem("playerName", playerName);
+    localStorage.setItem("dificulty", 1); 
+    localStorage.setItem("Map", 3); 
+  }
+  
+});
+// Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
+document.getElementById("VS32").addEventListener("click", () => {
   const playerName = document.getElementById("usernameInput").value;
   console.log("Nombre del jugador:", playerName);
   if (playerName) {
     localStorage.setItem("playerName", playerName); // Guardar nombre en el navegador
+    localStorage.setItem("dificulty", 2); 
+    localStorage.setItem("Map", 3); 
   }
   
 });

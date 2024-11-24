@@ -9,10 +9,13 @@ import { MTLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/j
 // Inicializa la conexión al servidor de Socket.IO
 // Conexión al servidor de Socket.IO
 const socket = io();
+let lives = 3; // Cantidad de vidas
 let localPlayer = null; // Jugador local
+let gameOverBool = false;
 let otherPlayer = null; // Jugador remoto
 const playerName = localStorage.getItem("playerName");
-
+const map = parseInt(localStorage.getItem("Map"), 10); // Convierte a número entero
+const dificultad = parseInt(localStorage.getItem("Dificulty"), 10); // Convierte a número entero
 // Crear jugador local
 function createLocalPlayer(data) {
   console.log("[DEBUG] Creando jugador local con datos:", data);
@@ -42,6 +45,12 @@ function createOtherPlayer(data) {
 // Manejar conexión al servidor
 socket.on('connect', () => {
   console.log("[DEBUG] Conectado al servidor...");
+
+  socket.emit('GameConfig', {
+    name: playerName,
+    map: map,
+    difficulty: dificultad,
+  });
 
   // Emitir evento para registrar al jugador local
   socket.emit('Iniciar', playerName);
@@ -74,17 +83,70 @@ socket.on('JugadorConectado', (player) => {
   }
 });
 
-// Manejar desconexión de un jugador
 socket.on('JugadorDesconectado', (data) => {
-  console.log("[DEBUG] Jugador desconectado:", data);
+  console.log(`[DEBUG] Jugador desconectado: ${data.name}`);
 
   if (otherPlayer && otherPlayer.name === data.name) {
-    scene.remove(otherPlayer); // Remover al jugador remoto de la escena
+    removeModelFromScene(otherPlayer);
     otherPlayer = null;
     console.log("[DEBUG] Jugador remoto eliminado.");
   }
 });
 
+
+// Escuchar actualización de vidas compartidas
+socket.on('updateSharedLives', (data) => {
+  console.log(`[DEBUG] Vidas compartidas actualizadas: ${data.lives}`);
+  lives=data.lives;
+  renderLives(); // Actualiza la UI con las vidas compartidas
+});
+
+// Escuchar actualización de vidas individuales
+socket.on('updatePlayerLives', (data) => {
+  console.log(`[DEBUG] Vidas del jugador ${data.name} actualizadas: ${data.lives}`);
+  if (data.name === playerName) {
+    lives=data.lives;
+    renderLives(); // Actualiza las vidas locales
+  }
+});
+
+// Escuchar fin del juego
+socket.on('FinDeJuego', (data) => {
+  console.log(`[DEBUG] Fin del juego: ${data.resultado}`);
+  alert(`Fin del juego: ${data.resultado}`);
+  gameOver();
+});
+
+function removeModelFromScene(model) {
+  if (!model || !model.objeto3D) {
+    console.warn("[WARN] El modelo no es válido o no tiene objeto3D. No se puede eliminar.");
+    return;
+  }
+
+  console.log(`[DEBUG] Eliminando modelo ${model.name} de la escena.`);
+
+  // Recorrer y eliminar hijos (si existen)
+  model.objeto3D.traverse((child) => {
+    if (child.isMesh) {
+      if (child.geometry) {
+        child.geometry.dispose(); // Liberar geometría
+      }
+      if (child.material) {
+        // Liberar materiales
+        if (Array.isArray(child.material)) {
+          child.material.forEach((mat) => mat.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+    }
+  });
+
+  // Remover el modelo de la escena
+  scene.remove(model.objeto3D);
+  model.objeto3D = null; // Limpiar la referencia para liberar memoria
+  console.log("[DEBUG] Modelo eliminado de la escena.");
+}
 const world = new CANNON.World();
 world.gravity.set(0, -9.82, 0);
 
@@ -96,9 +158,9 @@ camera.lookAt(0, 0, 0);
 // Mapa Restaurate = 1
 // Mapa Navidad = 2
 // Mapa Crustacio = 3 (Multijugador)
-let SelectedMap = 3;
+let SelectedMap = map;
 
-let Dificulty = 2; // 1 = Facil, 2 = Dificil
+let Dificulty = dificultad; // 1 = Facil, 2 = Dificil
 
 //variables del mapa de navidad
 let soda, deliver, letuce, tomato, stove, bigtable2, bigtable3, chef, bigtable, table, trash,
@@ -155,7 +217,7 @@ let orderInterval;
 // }
 updateOrderInterval();
 
-let lives = 3; // Cantidad de vidas
+
 const fullLifeImage = 'Assets/heat_icon.png'; 
 const emptyLifeImage = 'Assets/heat_icon_empty.png';
 
@@ -353,6 +415,57 @@ $(document).ready(function () {
 
       }
 
+      if (isCollision(localPlayer, letuce2)) {
+        console.log("Colisión detectada entre el localPlayer y la lechuga2");
+        imgInventario = inventario.getLetuce();
+      }
+      if (isCollision(localPlayer, bread2)) {
+        console.log("Colisión detectada entre el localPlayer y el pan2");
+        imgInventario = inventario.getBread();
+      }
+
+      if (isCollision(localPlayer, soda2)) {
+        console.log("Colisión detectada entre el localPlayer y la soda2");
+        imgInventario = inventario.getSoda();
+      }
+      if (isCollision(localPlayer, deliver2)) {
+        console.log("Colisión detectada entre el localPlayer y la entrega2");
+        checkDelivery(inventario);
+        imgInventario = inventario.completeOrder();
+      }
+      if (isCollision(localPlayer, trash2)) {
+        console.log("Colisión detectada entre el otherPlayer y la basura2");
+        imgInventario = inventario.trash();
+      }
+
+      //pone a cocinar la carne cruda
+      if (isCollision(localPlayer, stove2) && stoveState2 == 1 && inventario.rawmeat) {
+        console.log("Colisión detectada entre el localPlayer y la estufa2");
+        // Lógica para recoger la entrega
+        imgInventario = inventario.trash();
+        stoveState2 = 2; //cruda cocinando
+        startCronometro2(4000);
+      }
+
+      if (isCollision(localPlayer, stove2) && stoveState2 == 2) {    // && inventario.isInventoryEmpty()
+        console.log("Colisión detectada entre el localPlayer y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
+        console.log("La carne se esta cocinando, espera un momento");
+      }
+
+      if (isCollision(localPlayer, stove2) && stoveState2 == 3) {   // para recoger la carne cocida
+        console.log("Colisión detectada entre el localPlayer y la estufa con carne cocida");
+        // Lógica para recoger la entrega
+        imgInventario = inventario.getDoneMeat();
+        stoveState2 = 1; //vaciar la estufa
+        stopCronometro();
+      }
+
+      if (isCollision(localPlayer, stove2) && stoveState2 == 4 && inventario.isInventoryEmpty()) {    //para recoger la carne quemada
+        console.log("Colisión detectada entre el localPlayer y la estufa con carne quemada");
+        // Lógica para recoger la entrega
+        imgInventario = inventario.getBurnedMeat();
+        stoveState2 = 1; //vaciar la estufa
+      }
 
       if (powerUp && isCollision(localPlayer, powerUp) && isPowerUp) {
         console.log(`Colisión detectada entre el localPlayer y el ${powerUp.type}`);
@@ -579,7 +692,7 @@ $(document).ready(function () {
 
       if (imgInventario2) {
         console.log("imgInventario2:", imgInventario2);
-        InventoryImage2(imgInventario2);
+        // InventoryImage2(imgInventario2);
       }
 
     }
@@ -618,6 +731,10 @@ $(document).ready(function () {
     speed = inventario.speed;
     speed2 = inventario2.speed;
 
+    if(gameOverBool){
+      speed = 0;
+      speed2 = 0;
+    }
     // Movimiento del chef con W, A, S, D
     if (keysPressed['a'] && canMove(localPlayer, { x: -speed, z: 0 })) {
       localPlayer.PosX -= speed;
@@ -670,7 +787,11 @@ $(document).ready(function () {
       stove.Update();
       bigtable2.Update();
       bigtable3.Update();
+      if(localPlayer){
       localPlayer.Update();
+      }else{
+        console.log("localPlayer no existe");
+      }
 
       bigtable.Update();
       table.Update();
@@ -1021,25 +1142,25 @@ function MapaRestaurant() {
   table2.AddToScene(scene);
   table2.Scale(1.2, 1.2, .8);
 
-  chef = new CargarModelo('Models/chef/chef', manager, scene);
-  chef.PosX = -2;
-  chef.PosZ = 1;
-  chef.SetPositionThis();
-  chef.SetPosition(-2, 0, 1)
-  chef.AddToScene(scene);
+  // chef = new CargarModelo('Models/chef/chef', manager, scene);
+  // chef.PosX = -2;
+  // chef.PosZ = 1;
+  // chef.SetPositionThis();
+  // chef.SetPosition(-2, 0, 1)
+  // chef.AddToScene(scene);
 
-  chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
-  chef2.PosX = 1;
-  chef2.PosZ = 1;
-  chef2.SetPositionThis();
-  chef2.SetPosition(1, 0, 1);
-  chef2.AddToScene(scene);
+  // chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
+  // chef2.PosX = 1;
+  // chef2.PosZ = 1;
+  // chef2.SetPositionThis();
+  // chef2.SetPosition(1, 0, 1);
+  // chef2.AddToScene(scene);
 
-  chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
-  chef2.PosX = 5;
-  chef2.PosZ = 1;
-  chef2.SetPosition(2, 0, 1);
-  chef2.AddToScene(scene);
+  // chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
+  // chef2.PosX = 5;
+  // chef2.PosZ = 1;
+  // chef2.SetPosition(2, 0, 1);
+  // chef2.AddToScene(scene);
 
   bigtable = new CargarModelo('Models/bigtable/bigtable', manager, scene);
   bigtable.SetPosition(-4.1, 0, 4)
@@ -1155,15 +1276,15 @@ function MapaChristmas() {
   bigtable3.AddToScene(scene);
   bigtable3.Scale(1.4, 1.2, 1)
 
-  chef = new CargarModelo('Models/chef/chef', manager, scene);
-  chef.SetPosition(-1, 0, 1)
-  chef.AddToScene(scene);
+  // chef = new CargarModelo('Models/chef/chef', manager, scene);
+  // chef.SetPosition(-1, 0, 1)
+  // chef.AddToScene(scene);
 
-  chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
-  chef2.PosX = 1;
-  chef2.PosZ = 1;
-  chef2.SetPosition(1, 0, 1)
-  chef2.AddToScene(scene);
+  // chef2 = new CargarModelo('Models/chef2/chef2', manager, scene);
+  // chef2.PosX = 1;
+  // chef2.PosZ = 1;
+  // chef2.SetPosition(1, 0, 1)
+  // chef2.AddToScene(scene);
 
   bigtable = new CargarModelo('Models/bigtable/bigtable', manager, scene);
   bigtable.SetPosition(-4, 0, 4)
@@ -1587,6 +1708,14 @@ function renderLives() {
 }
 
 function loseLife() {
+  if (SelectedMap === 1 || SelectedMap === 2) {
+    // Modo cooperativo: vidas compartidas
+    socket.emit('updateSharedLives', { lives: lives - 1 });
+  } else if (SelectedMap === 3) {
+    // Modo versus: vidas individuales
+    socket.emit('updatePlayerLives', { name: playerName, lives: lives - 1 });
+  }
+
   if (lives > 1) {
     lives--; // Reduce una vida
     renderLives(); // Actualiza la interfaz
@@ -1612,7 +1741,7 @@ function gameOver() {
 
   // Añádelo al body
   $('body').append(overlay);
-
+  gameOverBool = true;
   console.log('Game Over');
 }
 
