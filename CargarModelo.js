@@ -9,6 +9,7 @@ export class CargarModelo {
     this.PosX = 0;
     this.PosY = 0;
     this.PosZ = 0;
+    this.name = null;
     this.boundingBox = new THREE.Box3().setFromObject(this.objeto3D);
 
     this.scene = scene;
@@ -60,6 +61,7 @@ export class CargarModelo {
 
   SetPositionThis() {
     this.SetPosition(this.PosX, this.PosY, this.PosZ);
+        // Enviar posición actualizada al servidor
   }
 
   AddToScene(scene) {

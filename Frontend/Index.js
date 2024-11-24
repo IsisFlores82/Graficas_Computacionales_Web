@@ -118,91 +118,33 @@ function validateUsername() {
 }
 
 
-document.addEventListener('DOMContentLoaded', function() {
-  var playerList = document.getElementById('playerList');
-
-  // Ejemplo de jugadores
-  var players = ['Nevi', 'Ryneh', 'Imsis']; 
-
-  players.forEach(function(player) {
-    if (playerList.children.length < 4) { // Asegura que no haya más de 4 jugadores, posiblemente sean solo 2 en el juego final
-      var listItem = document.createElement('li');
-      listItem.className = 'list-group-item';
-      listItem.textContent = player;
-      playerList.appendChild(listItem);
-    }
-  });
-});
-
-document.getElementById('BtnCreateGame').addEventListener('click', function() {
-  var gameMenuModalElement = document.getElementById('GameMenuModal');
-  var createGameModalElement = document.getElementById('CreateGameModal');
+document.getElementById('Coop11').addEventListener('click', function() {
   if (validateUsername()){
-  alert('Partida creada con el nombre de usuario: ' + document.getElementById('usernameInput').value);
-
-  var gameMenuModal = bootstrap.Modal.getInstance(gameMenuModalElement);
-  if (gameMenuModal) {
-    gameMenuModal.hide();
-  }
-
-    var createGameModal = new bootstrap.Modal(createGameModalElement);
-    createGameModal.show();
+  alert('Uniendose con el nombre de usuario: ' + document.getElementById('usernameInput').value);
+    window.location.href = '/game.html';
   }
 });
 
-document.getElementById('BtnSearchGame').addEventListener('click', function() {
-  var gameMenuModalElement = document.getElementById('GameMenuModal');
-  var joinGameModalElement = document.getElementById('JoinGameModal');
+document.getElementById('Coop22').addEventListener('click', function() {
   if (validateUsername()){
-    alert('Buscando partidas con el nombre de usuario: ' + document.getElementById('usernameInput').value);
-
-  var gameMenuModal = bootstrap.Modal.getInstance(gameMenuModalElement);
-  if (gameMenuModal) {
-    gameMenuModal.hide();
-  }
-
-    var joinGameModal = new bootstrap.Modal(joinGameModalElement);
-    joinGameModal.show();
+    alert('Uniendose con el nombre de usuario: ' + document.getElementById('usernameInput').value);
+    window.location.href = '/game.html';
   }
 });
 
-document.querySelectorAll('#availableGamesList .list-group-item').forEach(item => {
-  item.addEventListener('click', function() {
-
-    document.querySelectorAll('#availableGamesList .list-group-item').forEach(el => {
-      el.classList.remove('active');
-    });
-
-
-    this.classList.add('active');
-
-    // Habilitar el botón "Unirse"
-    document.getElementById('joinGameButton').disabled = false;
-    document.getElementById('joinGameButton').dataset.game = this.dataset.game;
-  });
-});
-
-document.getElementById('joinGameButton').addEventListener('click', function() {
-  var selectedGame = this.dataset.game;
-
-  if (selectedGame) {
-    console.log('Unirse a la partida:', selectedGame);
-    
-    var joinGameModalElement = document.getElementById('JoinGameModal');
-    var joinGameModal = bootstrap.Modal.getInstance(joinGameModalElement);
-    if (joinGameModal) {
-      joinGameModal.hide();
-      window.location.href = 'UI.html';
-    }
-  } else {
-    alert('Por favor, selecciona una partida antes de unirte.');
+document.getElementById('VS31').addEventListener('click', function() {
+  if (validateUsername()){
+  alert('Uniendose con el nombre de usuario: ' + document.getElementById('usernameInput').value);
+  window.location.href = '/game.html';
   }
 });
 
-document.getElementById('startGameButton').addEventListener('click', function() {
-      window.location.href = 'UI.html';
+document.getElementById('VS32').addEventListener('click', function() {
+  if (validateUsername()){
+    alert('Uniendose con el nombre de usuario: ' + document.getElementById('usernameInput').value);
+    window.location.href = '/game.html';
+  }
 });
-
 
 // Valor del porcentaje de la barra de volumen 
 const volumeSlider = document.getElementById('volumegame');
