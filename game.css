@@ -1,3 +1,11 @@
+:root {
+  --color-principal-orange: #ffb730;  
+  --color-secundario-orange: #db991e;
+
+  --color-principal-yellow: #ffce0a;
+  --color-principal-red: #ec0911;
+
+}
 .name-player {
   position: fixed;
   bottom: 10px;
@@ -119,4 +127,29 @@
   font-weight: bold; /* Opción para que sea más gruesa */
   color: #333; /* Cambia el color si lo deseas */
   background-color: rgb(175, 216, 241);
+}
+
+.btn-orange{
+  font-size: 25px;
+  font-weight: 500;
+  background-color: var(--color-principal-yellow);
+  border-color: var(--color-secundario-orange);
+
+}
+.btn-orange:hover{
+  background-color: var(--color-secundario-orange);
+  border-color: var(--color-secundario-orange);
+}
+
+
+.bg-orange{
+  background-color: var(--color-principal-orange);
+}
+.bg-gray{
+  background-color: var(--color-principal-orange);
+}
+
+
+.logo-small{
+  width:40%;
 }

@@ -22,7 +22,6 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
-
   <link rel="stylesheet" href="/game.css">
 
   <script type="importmap">
@@ -66,17 +65,34 @@
 
   <img id="inventory-image" src="Inventory/empty.png" alt="Inventario Chef1" class="inventory-image">
 
-  <div id="cronometro" class="name-player">
+  <div id="namePlayer" class="name-player">
     Jugador 1
   </div>
 
 
+<!-- Modal de pausa  -->
+<div class="modal fade" id="PauseModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-body-secondary">
+      <div class="modal-header">
+        <img src="/Frontend/logo DD font.png" class="logo-small" alt="DISH DASH!">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex flex-column align-items-center justify-content-center">
+        <button id="BtnContinuar" class="btn btn-secondary btn-orange">Continuar</button>
+        <br>
+        <button id="BtnSalir" class="btn btn-secondary btn-orange">Salir</button>
+        <br>
+      </div>  
+    </div>
+  </div>
+</div>
 
    <!-- DIV PARA EL INVENTARIO DEL CHEF 2 
   <img id="inventory-image2" src="Inventory/empty.png" alt="Inventario Chef2" class="inventory-image2"> -->
 
-  <div id="cronometro" class="name-player2">
-    Jugador 2</div>
+  <!-- <div id="cronometro" class="name-player2">
+    Jugador 2</div> -->
 
   <!--  IMAGENES DE LAS ORDENES  -->
   <div id="gallery"></div>
@@ -86,7 +102,7 @@
 
   <!-- Import the main JavaScript file as a module -->
   <script type="module" src="/main.js"></script>
-
+  <script src="/Frontend/UI.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 
