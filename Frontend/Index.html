@@ -42,6 +42,9 @@
             <br>
             <button id="BtnSettings" class="btn btn-secondary btn-orange"> Settings</button>
             <br>
+            <button id="loginWithFacebook" class="btn btn-primary">
+              <i class="fab fa-facebook"></i> Inicia sesión con Facebook
+            </button>
           </div>  
         </div>
       </div>
@@ -273,7 +276,62 @@
     </div>
   </div>
 </div>
-  
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<script>
+  // Configurar el SDK de Facebook
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId: '3789876967895990', // Reemplaza con tu App ID
+      cookie: true,
+      xfbml: true,
+      version: 'v21.0'
+    });
+
+    // Verificar si el usuario ya está conectado
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  };
+
+  // Manejar el estado de inicio de sesión
+  function statusChangeCallback(response) {
+    if (response.status === 'connected') {
+      console.log('Usuario conectado con Facebook');
+      fetchUserInfo();
+    } else {
+      console.log('Usuario no conectado con Facebook');
+    }
+  }
+
+  // Obtener información del usuario
+  function fetchUserInfo() {
+    FB.api('/me', { fields: 'name,email' }, function(response) {
+      console.log('Información del usuario:', response);
+      alert(`Bienvenido, ${response.name}!`);
+    // Establece el nombre como el valor del input
+    const usernameInput = document.getElementById('usernameInput');
+    if (usernameInput) {
+      usernameInput.value = response.name;
+    } else {
+      console.error("No se encontró el elemento con id 'usernameInput'.");
+    }
+      
+    });
+  }
+
+  // Manejar el clic en el botón de inicio de sesión
+  document.getElementById('loginWithFacebook').addEventListener('click', function() {
+    FB.login(function(response) {
+      if (response.authResponse) {
+        console.log('Inicio de sesión exitoso');
+        fetchUserInfo();
+      } else {
+        console.log('El usuario canceló el inicio de sesión o no autorizó la aplicación');
+      }
+    }, { scope: 'public_profile,email' });
+  });
+</script>
 <script> 
 
 // Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
@@ -296,7 +354,7 @@ document.getElementById("Coop22").addEventListener("click", () => {
   console.log("Nombre del jugador:", playerName);
   if (playerName) {
     localStorage.setItem("playerName", playerName); // Guardar nombre en el navegador
-    localStorage.setItem("dificulty", 2); 
+    localStorage.setItem("Dificulty", 2); 
     localStorage.setItem("Map", 2); 
   }
   
@@ -307,7 +365,7 @@ document.getElementById("VS31").addEventListener("click", () => {
   console.log("Nombre del jugador:", playerName);
   if (playerName) {
     localStorage.setItem("playerName", playerName);
-    localStorage.setItem("dificulty", 1); 
+    localStorage.setItem("Dificulty", 1); 
     localStorage.setItem("Map", 3); 
   }
   
@@ -318,7 +376,7 @@ document.getElementById("VS32").addEventListener("click", () => {
   console.log("Nombre del jugador:", playerName);
   if (playerName) {
     localStorage.setItem("playerName", playerName); // Guardar nombre en el navegador
-    localStorage.setItem("dificulty", 2); 
+    localStorage.setItem("Dificulty", 2); 
     localStorage.setItem("Map", 3); 
   }
   
