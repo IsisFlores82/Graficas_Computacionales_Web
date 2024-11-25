@@ -1,0 +1,16 @@
+{
+    "name": "ryneh/dishdash-api",
+    "description": "WebAPI Graficas",
+    "autoload": {
+        "psr-4": {
+            "Ryneh\\DishdashApi\\": "App/"
+        }
+    },
+    "authors": [
+        {
+            "name": "rynehh",
+            "email": "ryneh_h@outlook.com"
+        }
+    ],
+    "require": {}
+}
