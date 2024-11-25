@@ -7,6 +7,19 @@ import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/j
 import { MTLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/MTLLoader.js';
 import { CargarChef } from './CargarChef.js';
 
+
+const successSound = new Audio('Assets/correct.mp3');
+const failureSound = new Audio('Assets/incorrect.mp3');
+const newOrderSound = new Audio('Assets/newOrder.mp3');
+const powerUpSound = new Audio('Assets/powerUp.mp3');
+const map1Audio = new Audio('Assets/Mad_Rush.mp3');
+const map2Audio = new Audio('Assets/Kitchen_Chaos_3.mp3');
+const map3Audio = new Audio('Assets/Grass_Skirt.mp3');
+
+
+
+
+
 // Inicializa la conexión al servidor de Socket.IO
 // Conexión al servidor de Socket.IO
 const socket = io();
@@ -33,7 +46,7 @@ function createLocalPlayer(data) {
 // Crear jugador remoto
 function createOtherPlayer(data) {
   console.log("[DEBUG] Creando jugador remoto con datos:", data);
-  otherPlayer = new CargarModelo('Models/chef2/chef2', manager, scene);
+  otherPlayer = new CargarChef('Models/chef2/chefwalk2.gltf', manager, scene);
   otherPlayer.name = data.name;
   otherPlayer.PosX = data.PosX;
   otherPlayer.PosZ = data.PosZ;
@@ -161,6 +174,7 @@ camera.lookAt(0, 0, 0);
 // Mapa Crustacio = 3 (Multijugador)
 let SelectedMap = map;
 
+
 let Dificulty = dificultad; // 1 = Facil, 2 = Dificil
 
 //variables del mapa de navidad
@@ -247,7 +261,8 @@ if (SelectedMap == 1 || SelectedMap == 2) {
 
 }
 if (SelectedMap == 3) {
-
+  map3Audio.loop = true; 
+  map3Audio.play(); 
   possiblePositions = [
     { x: 3.2, y: 0, z: 1.5 },
     { x: -3, y: 0, z: 2.2 },
@@ -255,6 +270,15 @@ if (SelectedMap == 3) {
     { x: 2.8, y: 0, z: 1.5 }
   ];
 
+}
+
+if(SelectedMap == 1){
+  map1Audio.loop = true;
+  map1Audio.play(); 
+}
+if(SelectedMap == 2){
+  map2Audio.loop = true;
+  map2Audio.play(); 
 }
 
 
@@ -299,7 +323,7 @@ manager.onLoad = function () {
   console.log('Todos los modelos se han cargado.');
 };
 
-let isMoving = false;
+let isMovingl = false;
 let alreadyWalking = false;
 
 $(document).ready(function () {
@@ -478,7 +502,7 @@ $(document).ready(function () {
 
       if (powerUp && isCollision(localPlayer, powerUp) && isPowerUp) {
         console.log(`Colisión detectada entre el localPlayer y el ${powerUp.type}`);
-
+        powerUpSound.play();
         if (powerUp.type === 'boots') {
           inventario.speed = 0.2;
           powerUp.RemoveFromScene(scene);
@@ -611,7 +635,7 @@ $(document).ready(function () {
 
       if (powerUp && isCollision(otherPlayer, powerUp) && isPowerUp) {
         console.log(`Colisión detectada entre el localPlayer y el ${powerUp.type}`);
-
+        powerUpSound.play();
         if (powerUp.type === 'boots') {
           inventario2.speed = 0.2;
           powerUp.RemoveFromScene(scene);
@@ -735,6 +759,7 @@ $(document).ready(function () {
 
     if (e.key.toLowerCase() === 'w' || e.key.toLowerCase() === 'a' || e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'd') {
       alreadyWalking = false;
+      //isMovingl = false;
     }
   });
 
@@ -754,7 +779,7 @@ $(document).ready(function () {
     // Movimiento del chef con W, A, S, D
     if (keysPressed['a'] && canMove(localPlayer, { x: -speed, z: 0 })) {
       localPlayer.PosX -= speed;
-      isMoving = true;      //chef se esta moviendo
+      isMovingl = true;      //chef se esta moviendo
       alreadyWalking = true;
       localPlayer.objeto3D.rotation.y = -Math.PI / 2;
     }
@@ -763,7 +788,7 @@ $(document).ready(function () {
       localPlayer.PosX += speed;
       localPlayer.SetPositionThis();
       localPlayer.objeto3D.rotation.y = Math.PI / 2;
-      isMoving = true;
+      isMovingl = true;
       alreadyWalking = true;
     }
 
@@ -771,7 +796,7 @@ $(document).ready(function () {
       localPlayer.PosZ -= speed;
       localPlayer.SetPositionThis();
       localPlayer.objeto3D.rotation.y = Math.PI;
-      isMoving = true;
+      isMovingl = true;
       alreadyWalking = true;
 
     }
@@ -780,12 +805,12 @@ $(document).ready(function () {
       localPlayer.PosZ += speed;
       localPlayer.SetPositionThis();
       localPlayer.objeto3D.rotation.y = 0;
-      isMoving = true;
+      isMovingl = true;
       alreadyWalking = true;
 
     }
 
-    if (isMoving) {
+    if (isMovingl) {
       if (!alreadyWalking) {
         localPlayer.changeAnimationWalk();
       }
@@ -794,6 +819,7 @@ $(document).ready(function () {
       console.log("regresar a idle");
       //localPlayer.changeAnimationIdle(); // Cambiar a animación en reposo
     }
+
 
     //localPlayer.playAnimation(localPlayer.idleName);
 
@@ -973,7 +999,8 @@ function updateServerPosition() {
       name: localPlayer.name,
       PosX: localPlayer.PosX,
       PosY: localPlayer.PosY || 0, // Si no se usa la coordenada Y, envía 0 por defecto
-      PosZ: localPlayer.PosZ
+      PosZ: localPlayer.PosZ,
+      isMoving: isMovingl,
     });
   }
 }
@@ -982,13 +1009,22 @@ socket.on('updatePlayerPosition', (data) => {
   console.log('[DEBUG] Actualización de posición recibida:', data);
 
   // Actualiza la posición del jugador remoto
-  if (otherPlayer && otherPlayer.name === data.name) {
+  if (otherPlayer &&
+     otherPlayer.name === data.name) {
     otherPlayer.PosX = data.PosX;
     otherPlayer.PosY = data.PosY;
     otherPlayer.PosZ = data.PosZ;
+    otherPlayer.isMoving = data.isMoving;
     otherPlayer.SetPositionThis();
     console.log('[DEBUG] Posición del jugador remoto actualizada:', otherPlayer);
   }
+
+  if (data.isMoving) {
+    otherPlayer.changeAnimationWalk();
+  } else {
+    //otherPlayer.playAnimation('Idle');
+  }
+
 });
 
 // Función para actualizar la imagen del invnetario
@@ -1659,10 +1695,13 @@ function generateRandomOrder() {
     // Usa un atributo único para identificar la imagen
     const imgElement = `<img src="${imagePath}" alt="Order" data-order-id="${randomOrder.id}">`;
     $('#gallery').append(imgElement);
+
+    newOrderSound.play();
   }
   if (currentOrders.length >= maxOrders) {
     console.log("Maximo de ordenes alcanzado");
     loseLife();
+    failureSound.play();
   }
 
 
@@ -1703,11 +1742,14 @@ function checkDelivery(inventory) {
       updateTimeOrdersBasedOnScore();
       currentOrders.splice(i, 1); // Elimina la orden cumplida
       removeOrder(orderId); // Elimina la imagen asociada
+      successSound.play(); // Reproduce el sonido de correcto
       return true; // Detiene la función si cumple con una orden
     }
   }
   console.log('Orden no cumplida');
+  failureSound.play();
   loseLife();
+  
   return false;
 }
 

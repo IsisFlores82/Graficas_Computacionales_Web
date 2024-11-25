@@ -61,6 +61,7 @@ io.on('connection', (socket) => {
       PosY: posicion.y,
       PosZ: posicion.z,
       lives:3,
+      IsMoving: false,
     };
 
     listaJugadores.push(jugador);
@@ -83,13 +84,15 @@ io.on('connection', (socket) => {
       jugador.PosX = data.PosX;
       jugador.PosY = data.PosY;
       jugador.PosZ = data.PosZ;
+      jugador.IsMoving = data.IsMoving;
   
       // Emitir la posición actualizada a los demás jugadores
       socket.broadcast.emit('updatePlayerPosition', {
         name: data.name,
         PosX: data.PosX,
         PosY: data.PosY,
-        PosZ: data.PosZ
+        PosZ: data.PosZ,
+        IsMoving: data.IsMoving,
       });
   
       // console.log(`[DEBUG] Posición actualizada en el servidor para ${data.name}:`, jugador);
@@ -142,6 +145,7 @@ io.on('connection', (socket) => {
       }
     }
   });
+
 
   // Manejar desconexión de un jugador
   socket.on('disconnect', () => {
