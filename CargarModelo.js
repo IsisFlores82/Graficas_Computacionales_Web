@@ -42,7 +42,7 @@ export class CargarModelo {
     this.boundingBoxHelper = new THREE.BoxHelper(this.objeto3D, 0xff0000); // color rojo
     this.boundingBoxHelper.update(); // Actualizar la caja con las dimensiones del objeto
     this.scene.add(this.boundingBoxHelper);
-    //this.toggleBoundingBoxVisibility();
+    this.toggleBoundingBoxVisibility();
   }
 
   Scale(ScaleX, ScaleY, ScaleZ) {

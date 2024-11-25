@@ -36,6 +36,8 @@ function setAudioVolumes() {
   failureSound.volume = generalVolume * sfxVolume;
   newOrderSound.volume = generalVolume * sfxVolume;
   powerUpSound.volume = generalVolume * sfxVolume;
+  fireSound.volume = generalVolume * sfxVolume;
+
 }
 
 // Aplicar volúmenes iniciales
@@ -952,7 +954,7 @@ $(document).ready(function () {
       stoveBurned.RemoveFromScene(scene);
       stove.RemoveFromScene(scene);
 
-      stoveMeat.AddToScene(scene)
+      stoveMeat.AddToScene(scene);
 
     }
     if (stoveState == 4) {  //quemado
@@ -983,10 +985,6 @@ $(document).ready(function () {
 
       if (stoveState2 == 2) {  //crudo
         //quita los otros modelos que no se veran
-
-        
-        
-
         stoveBurned2.RemoveFromScene(scene);
         stoveMeat2.RemoveFromScene(scene);
         stove2.RemoveFromScene(scene);
@@ -1001,7 +999,7 @@ $(document).ready(function () {
         stoveBurned2.RemoveFromScene(scene);
         stove2.RemoveFromScene(scene);
 
-        stoveMeat2.AddToScene(scene)
+        stoveMeat2.AddToScene(scene);
 
       }
       if (stoveState2 == 4) {  //quemado
@@ -1551,7 +1549,7 @@ function MapaCrustacio() {
   stoveRaw2.Rotate(axis, angle);
 
   stoveMeat2 = new CargarModelo('Models/stove/done/stoveAndMeat', manager, scene);
-  stoveMeat2.SetPosition(4.1, 0, 40.7)
+  stoveMeat2.SetPosition(4.1, 0, 4.7)
   stoveMeat2.Scale(1.6, 1.5, 1.5)
   stoveMeat2.Rotate(axis, angle);
 

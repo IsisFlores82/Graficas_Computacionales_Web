@@ -73,7 +73,8 @@ export class CargarChef {
     this.boundingBoxHelper.update(); // Actualizar la caja con las dimensiones del objeto
   
     // Asegúrate de que el helper se agregue a la escena
-    this.scene.add(this.boundingBoxHelper);
+    //this.scene.add(this.boundingBoxHelper);
+    
   }
 
   SetPosition(x, y, z) {
@@ -171,13 +172,5 @@ export class CargarChef {
 
   changeAnimationIdle() {    
     this.playAnimation(this.idleName);   
-  }
-
-  
-
-  toggleBoundingBoxVisibility() {
-    if (this.boundingBoxHelper) {
-      this.boundingBoxHelper.visible = !this.boundingBoxHelper.visible;
-    }
   }
 }
