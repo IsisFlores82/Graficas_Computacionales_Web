@@ -859,7 +859,6 @@ $(document).ready(function () {
       } else {
         console.log("localPlayer no existe");
       }
-
       bigtable.Update();
       table.Update();
       trash.Update();
@@ -878,6 +877,10 @@ $(document).ready(function () {
       //pan.Update();
 
     }
+
+  if(SelectedMap == 1){
+      table5.Update();
+  }
 
     //Mapa Coop
     if (SelectedMap == 3) {
