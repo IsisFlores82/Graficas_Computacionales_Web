@@ -782,6 +782,7 @@ $(document).ready(function () {
 
     if (isMoving) {
       if (!alreadyWalking) {
+        console.log("Cambiando a animación de caminar");
         localPlayer.changeAnimationWalk();
       }
     }
