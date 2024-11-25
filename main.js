@@ -6,6 +6,10 @@ import { Inventario } from './Inventario.js';
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/MTLLoader.js';
 import { CargarChef } from './CargarChef.js';
+// Carga los valores de volumen desde localStorage
+const generalVolume = localStorage.getItem('generalVolume') || '50';
+const musicVolume = localStorage.getItem('musicVolume') || '50';
+const sfxVolume = localStorage.getItem('sfxVolume') || '50';
 
 
 const successSound = new Audio('Assets/correct.mp3');
@@ -16,8 +20,25 @@ const map1Audio = new Audio('Assets/Mad_Rush.mp3');
 const map2Audio = new Audio('Assets/Kitchen_Chaos_3.mp3');
 const map3Audio = new Audio('Assets/Grass_Skirt.mp3');
 
+function setAudioVolumes() {
+  const generalVolume = localStorage.getItem('generalVolume') / 100;
+  const musicVolume = localStorage.getItem('musicVolume') / 100;
+  const sfxVolume = localStorage.getItem('sfxVolume') / 100;
 
+  // Configurar volúmenes generales
+  map1Audio.volume = generalVolume * musicVolume;
+  map2Audio.volume = generalVolume * musicVolume;
+  map3Audio.volume = generalVolume * musicVolume;
 
+  // Configurar volúmenes de efectos de sonido
+  successSound.volume = generalVolume * sfxVolume;
+  failureSound.volume = generalVolume * sfxVolume;
+  newOrderSound.volume = generalVolume * sfxVolume;
+  powerUpSound.volume = generalVolume * sfxVolume;
+}
+
+// Aplicar volúmenes iniciales
+setAudioVolumes();
 
 
 // Inicializa la conexión al servidor de Socket.IO

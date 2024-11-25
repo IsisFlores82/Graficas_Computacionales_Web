@@ -227,20 +227,6 @@
             <span id="volumeValue3" class="volume-value">50%</span>
           </div>
           <br>
-          <!-- <label for="resolution" class="resolucionlabel">Resolución de pantalla</label>
-        <br>
-        <div class="container-mt-5">          
-          <div class="btn-group" role="group" aria-label="Selector">
-            <input type="radio" class="btn-check" name="options" id="baja" autocomplete="off">
-            <label class="btn btn-outline-custom" for="baja">Baja</label>
-        
-            <input type="radio" class="btn-check" name="options" id="normal" autocomplete="off" checked>
-            <label class="btn btn-outline-custom" for="normal">Normal</label>
-        
-            <input type="radio" class="btn-check" name="options" id="alta" autocomplete="off">
-            <label class="btn btn-outline-custom" for="alta">Alta</label>
-          </div>
-        </div> -->
         </div>
       </div>
     </div>
@@ -396,6 +382,60 @@ window.onload = fetchLeaderboardData;
       }
 
     });
+
+    // Selecciona el video y el botón
+const video = document.getElementById('background-video');
+const unmuteBtn = document.getElementById('unmute-btn');
+
+// Agrega un listener al botón para alternar el mute del video
+unmuteBtn.addEventListener('click', () => {
+  // Alternar el estado de mute
+  video.muted = !video.muted;
+
+  // Cambiar el texto del botón según el estado
+  if (video.muted) {
+    unmuteBtn.textContent = 'Activar sonido';
+  } else {
+    unmuteBtn.textContent = 'Silenciar sonido';
+  }
+});
+
+// Selección de los sliders y spans de volumen
+const generalSlider = document.getElementById('volumegame');
+const musicSlider = document.getElementById('volumemusic');
+const sfxSlider = document.getElementById('volumesfx');
+const generalValue = document.getElementById('volumeValue');
+const musicValue = document.getElementById('volumeValue2');
+const sfxValue = document.getElementById('volumeValue3');
+
+// Función para guardar los valores en localStorage y actualizar el texto
+function updateVolume(type, value) {
+  localStorage.setItem(type, value);
+  if (type === 'generalVolume') generalValue.textContent = `${value}%`;
+  if (type === 'musicVolume') musicValue.textContent = `${value}%`;
+  if (type === 'sfxVolume') sfxValue.textContent = `${value}%`;
+}
+
+// Event listeners para los sliders
+generalSlider.addEventListener('input', () => updateVolume('generalVolume', generalSlider.value));
+musicSlider.addEventListener('input', () => updateVolume('musicVolume', musicSlider.value));
+sfxSlider.addEventListener('input', () => updateVolume('sfxVolume', sfxSlider.value));
+
+// Inicializar los valores de los sliders desde localStorage
+window.addEventListener('DOMContentLoaded', () => {
+  const generalVolume = localStorage.getItem('generalVolume') || '50';
+  const musicVolume = localStorage.getItem('musicVolume') || '50';
+  const sfxVolume = localStorage.getItem('sfxVolume') || '50';
+
+  generalSlider.value = generalVolume;
+  musicSlider.value = musicVolume;
+  sfxSlider.value = sfxVolume;
+
+  updateVolume('generalVolume', generalVolume);
+  updateVolume('musicVolume', musicVolume);
+  updateVolume('sfxVolume', sfxVolume);
+});
+
   </script>
   <script src="/Frontend/Index.js"></script>
 </body>
