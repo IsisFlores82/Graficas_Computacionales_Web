@@ -299,6 +299,8 @@ manager.onLoad = function () {
   console.log('Todos los modelos se han cargado.');
 };
 
+let isMoving = false;
+let alreadyWalking = false;
 
 $(document).ready(function () {
   // Objeto para almacenar el estado de las teclas presionadas
@@ -730,6 +732,10 @@ $(document).ready(function () {
     if (e.key.toLowerCase() === '9') {
       inventario2.mostrarInventario();
     }
+
+    if (e.key.toLowerCase() === 'w' || e.key.toLowerCase() === 'a' || e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'd') {
+      alreadyWalking = false;
+    }
   });
 
   // Función de animación para mover los chefs
@@ -743,8 +749,7 @@ $(document).ready(function () {
       speed2 = 0;
     }
     //para ver si sera idle o walk
-    let isMoving = false;
-    let alreadyWalking = false;
+
 
     // Movimiento del chef con W, A, S, D
     if (keysPressed['a'] && canMove(localPlayer, { x: -speed, z: 0 })) {
@@ -782,14 +787,12 @@ $(document).ready(function () {
 
     if (isMoving) {
       if (!alreadyWalking) {
-        console.log("Cambiando a animación de caminar");
         localPlayer.changeAnimationWalk();
       }
     }
     else {
-
+      console.log("regresar a idle");
       //localPlayer.changeAnimationIdle(); // Cambiar a animación en reposo
-
     }
 
     //localPlayer.playAnimation(localPlayer.idleName);

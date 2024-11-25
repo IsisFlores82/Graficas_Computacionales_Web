@@ -13,6 +13,7 @@ export class CargarChef {
     this.PosZ = 0;
     this.currentAction = null;
     this.idleName = "";
+    this.walkName = "";
     
 
     const loader = new GLTFLoader(manager);
@@ -36,13 +37,18 @@ export class CargarChef {
       if (gltf.animations.length > 0) {
         this.playAnimation(gltf.animations[0].name); // Inicia la primera animación si existe
         this.idleName = gltf.animations[0].name;
+        this.walkName = gltf.animations[1].name;
+
+        console.log(`Animación por idle: ${this.idleName}`);
+        console.log(`Animación por walk: ${this.walkName}`);
+
       }
 
       // Añadir el objeto3D a la escena
       scene.add(this.objeto3D);
 
       // Establecer la posición de inicio
-      this.objeto3D.position.set(0, 0, 0);
+      //this.objeto3D.position.set(0, 0, 0);
     });
 
     this.objeto3D = new THREE.Object3D(); // Ya no es necesario porque gltf.scene se asigna después
@@ -153,18 +159,21 @@ export class CargarChef {
       console.warn(`La animación ${animationName} no existe.`);
     }
   }
-  
+
+ //changeAnimation() {    
+ //  this.playAnimation(this.idleName);   
+ //}
 
   // Nuevo método para cambiar de animación
-  changeAnimationWalk() {
-    
-    this.playAnimation('Armature|mixamo.com|Layer0.001');
-   
+  changeAnimationWalk() {    
+    this.playAnimation(this.walkName);   
   }
 
-  changeAnimationIdle() {
-    this.playAnimation(this.idleName);
+  changeAnimationIdle() {    
+    this.playAnimation(this.idleName);   
   }
+
+  
 
   toggleBoundingBoxVisibility() {
     if (this.boundingBoxHelper) {
