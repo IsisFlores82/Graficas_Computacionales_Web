@@ -19,6 +19,7 @@ const powerUpSound = new Audio('Assets/powerUp.mp3');
 const map1Audio = new Audio('Assets/Mad_Rush.mp3');
 const map2Audio = new Audio('Assets/Kitchen_Chaos_3.mp3');
 const map3Audio = new Audio('Assets/Grass_Skirt.mp3');
+const fireSound = new Audio('Assets/fire.mp3');
 
 function setAudioVolumes() {
   const generalVolume = localStorage.getItem('generalVolume') / 100;
@@ -961,7 +962,8 @@ $(document).ready(function () {
 
       stoveBurned.AddToScene(scene);
       const fireEffect = createSimpleFire(scene, stoveBurned.objeto3D.position);
-      stoveBurned.particleEffect = fireEffect; 
+      stoveBurned.particleEffect = fireEffect;
+      fireSound.play();
       
 
     }
@@ -1011,6 +1013,7 @@ $(document).ready(function () {
 
         const fireEffect = createSimpleFire(scene, stoveBurned2.objeto3D.position);
         stoveBurned2.particleEffect = fireEffect; 
+        fireSound.play();
       
         
 
