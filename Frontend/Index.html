@@ -180,64 +180,14 @@
             <table class="table table-striped table-bordered text-center">
               <thead>
                 <tr>
-                  <th scope="col">Rank</th>
-                  <th scope="col">Jugadores</th>
-                  <th scope="col">Puntuacion</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Datos Hardcodeados -->
-                <tr>
-                  <th scope="row">1</th>
-                  <td>ryneh,nevi</td>
-                  <td>5000</td>
-                </tr>
-                <tr>
-                  <th scope="row">2</th>
-                  <td>binchisas,pedroeml</td>
-                  <td>4500</td>
-                </tr>
-                <tr>
-                  <th scope="row">3</th>
-                  <td>hola,adios</td>
-                  <td>4000</td>
-                </tr>
-                <tr>
-                  <th scope="row">4</th>
-                  <td>que,rechazado</td>
-                  <td>3500</td>
-                </tr>
-                <tr>
-                  <th scope="row">5</th>
-                  <td>sergiorammus,dobetoons</td>
-                  <td>3000</td>
-                </tr>
-                <tr>
-                  <th scope="row">6</th>
-                  <td>vendo fotos,compro fotos</td>
-                  <td>2800</td>
-                </tr>
-                <tr>
-                  <th scope="row">7</th>
-                  <td>gordo,forro</td>
-                  <td>2600</td>
-                </tr>
-                <tr>
-                  <th scope="row">8</th>
-                  <td>kai,teo</td>
-                  <td>2400</td>
-                </tr>
-                <tr>
-                  <th scope="row">9</th>
-                  <td>natale,moytowni</td>
-                  <td>2200</td>
-                </tr>
-                <tr>
-                  <th scope="row">10</th>
-                  <td>pantoler,fakedobetoons</td>
-                  <td>2000</td>
-                </tr>
-              </tbody>
+                 <th scope="col">Rank</th>
+                 <th scope="col">Jugadores</th>
+                 <th scope="col">Puntuacion</th>
+               </tr>
+             </thead>
+             <tbody id="leaderboard-body">
+              <!-- Los datos se llenarán dinámicamente aquí -->
+            </tbody>
             </table>
           </div>
         </div>
@@ -339,32 +289,65 @@
       });
     }
 
-    // Manejar el clic en el botón de inicio de sesión
-    document.getElementById('loginWithFacebook').addEventListener('click', function () {
-      FB.login(function (response) {
-        if (response.authResponse) {
-          console.log('Inicio de sesión exitoso');
-          fetchUserInfo();
-        } else {
-          console.log('El usuario canceló el inicio de sesión o no autorizó la aplicación');
-        }
-      }, { scope: 'public_profile,email' });
-    });
-
-    const video = document.getElementById('background-video');
-    const unmuteBtn = document.getElementById('unmute-btn');
-
-    unmuteBtn.addEventListener('click', () => {
-      if (video.muted) {
-        video.muted = false; // Activa el sonido
-        unmuteBtn.textContent = 'Silenciar sonido';
+  // Manejar el clic en el botón de inicio de sesión
+  document.getElementById('loginWithFacebook').addEventListener('click', function() {
+    FB.login(function(response) {
+      if (response.authResponse) {
+        console.log('Inicio de sesión exitoso');
+        fetchUserInfo();
       } else {
-        video.muted = true; // Silencia el sonido
-        unmuteBtn.textContent = 'Activar sonido';
+        console.log('El usuario canceló el inicio de sesión o no autorizó la aplicación');
       }
+    }, { scope: 'public_profile,email' });
+  });
+</script>
+<script> 
+// Función para obtener los datos de la API y actualizar la tabla
+function fetchLeaderboardData() {
+  // Realizar la solicitud a la API
+  fetch('https://dishdashapi.mikuacademy.fun/api/puntuaciones')  // Asegúrate de usar la URL correcta
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        // Limpiar los datos previos en la tabla
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        leaderboardBody.innerHTML = '';
+
+        // Iterar sobre los datos y agregar las filas a la tabla
+        data.data.forEach((player, index) => {
+          // Crear una fila de la tabla
+          const row = document.createElement('tr');
+
+          // Crear la celda del rango
+          const rankCell = document.createElement('th');
+          rankCell.scope = 'row';
+          rankCell.textContent = index + 1;  // Para que empiece desde 1
+          row.appendChild(rankCell);
+
+          // Crear la celda del nombre del jugador
+          const nameCell = document.createElement('td');
+          nameCell.textContent = player.name;
+          row.appendChild(nameCell);
+
+          // Crear la celda de los puntos
+          const pointsCell = document.createElement('td');
+          pointsCell.textContent = player.puntos;
+          row.appendChild(pointsCell);
+
+          // Agregar la fila al cuerpo de la tabla
+          leaderboardBody.appendChild(row);
+        });
+      } else {
+        console.error('Error al obtener los datos del leaderboard');
+      }
+    })
+    .catch(error => {
+      console.error('Error de conexión o de la API:', error);
     });
-  </script>
-  <script>
+}
+
+// Llamar a la función para cargar los datos cuando la página se carga
+window.onload = fetchLeaderboardData;
 
     // Ejemplo: Enviar el nombre del jugador al servidor cuando inicien el juego
     document.getElementById("Coop11").addEventListener("click", () => {

@@ -17,6 +17,7 @@ app.use('/Frontend', express.static(join(__dirname, 'Frontend')));
 app.use('/game.html', express.static(join(__dirname, 'game.html')));
 app.use('/game.css', express.static(join(__dirname, 'game.css')));
 app.use('/main.js', express.static(join(__dirname, 'main.js')));
+app.use('/dishdashAPI', express.static(join(__dirname, 'dishdashAPI')));
 app.use('/CargarModelo.js', express.static(join(__dirname, 'CargarModelo.js')));
 app.use('/CargarChef.js', express.static(join(__dirname, 'CargarChef.js')));
 app.use('/Inventario.js', express.static(join(__dirname, 'Inventario.js')));

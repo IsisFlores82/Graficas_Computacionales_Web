@@ -807,7 +807,6 @@ $(document).ready(function () {
       localPlayer.objeto3D.rotation.y = 0;
       isMovingl = true;
       alreadyWalking = true;
-
     }
 
     if (isMovingl) {
@@ -1811,8 +1810,29 @@ function gameOver() {
   $('body').append(overlay);
   gameOverBool = true;
   console.log('Game Over');
+  saveScore(playerName, Score);
 }
 
+function saveScore(name, puntos) {
+  fetch('https://dishdashapi.mikuacademy.fun/api/puntuaciones/registro', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, puntos }),
+  })
+    .then(response => {
+      console.log('Respuesta sin procesar:', response); // Para inspeccionar la respuesta completa antes de procesarla.
+      return response.json(); // Convierte la respuesta en JSON.
+    })
+    .then(data => {
+      console.log('Datos procesados en data:', data); // Aquí ves lo que devuelve tu API.
+      alert('¡Puntaje guardado con éxito!');
+    })
+    .catch(error => {
+      console.error('Error al guardar el puntaje:', error);
+    });
+}
 function updateScore(newScore) {
   $('#score-value').text(newScore); // Actualiza el texto en la card
 }
