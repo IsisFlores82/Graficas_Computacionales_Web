@@ -18,6 +18,7 @@ app.use('/game.html', express.static(join(__dirname, 'game.html')));
 app.use('/game.css', express.static(join(__dirname, 'game.css')));
 app.use('/main.js', express.static(join(__dirname, 'main.js')));
 app.use('/CargarModelo.js', express.static(join(__dirname, 'CargarModelo.js')));
+app.use('/CargarChef.js', express.static(join(__dirname, 'CargarChef.js')));
 app.use('/Inventario.js', express.static(join(__dirname, 'Inventario.js')));
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, '/Frontend/Index.html'));
@@ -39,7 +40,7 @@ app.get('/', (req, res) => {
 //     });
 // });
 const posicionesIniciales = [
-  { x: -3, y: 0, z: 2 },
+  { x: -2, y: 0, z: 1.5 },
   { x: 2, y: 0, z: 2 },
 ];
 io.on('connection', (socket) => {

@@ -5,6 +5,7 @@ import { Inventario } from './Inventario.js';
 
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/MTLLoader.js';
+import { CargarChef } from './CargarChef.js';
 
 // Inicializa la conexión al servidor de Socket.IO
 // Conexión al servidor de Socket.IO
@@ -19,7 +20,7 @@ const dificultad = parseInt(localStorage.getItem("Dificulty"), 10); // Convierte
 // Crear jugador local
 function createLocalPlayer(data) {
   console.log("[DEBUG] Creando jugador local con datos:", data);
-  localPlayer = new CargarModelo('Models/chef/chef', manager, scene);
+  localPlayer = new CargarChef('Models/chef/chefWalk.gltf', manager, scene);
   localPlayer.name = data.name;
   localPlayer.PosX = data.PosX;
   localPlayer.PosZ = data.PosZ;
@@ -97,7 +98,7 @@ socket.on('JugadorDesconectado', (data) => {
 // Escuchar actualización de vidas compartidas
 socket.on('updateSharedLives', (data) => {
   console.log(`[DEBUG] Vidas compartidas actualizadas: ${data.lives}`);
-  lives=data.lives;
+  lives = data.lives;
   renderLives(); // Actualiza la UI con las vidas compartidas
 });
 
@@ -105,7 +106,7 @@ socket.on('updateSharedLives', (data) => {
 socket.on('updatePlayerLives', (data) => {
   console.log(`[DEBUG] Vidas del jugador ${data.name} actualizadas: ${data.lives}`);
   if (data.name === playerName) {
-    lives=data.lives;
+    lives = data.lives;
     renderLives(); // Actualiza las vidas locales
   }
 });
@@ -210,7 +211,7 @@ let maxOrders = 11;
 
 let TimeOrders = 10000;
 
-let orderInterval; 
+let orderInterval;
 // Generar órdenes aleatorias
 // if(!pause){
 //   setInterval(generateRandomOrder, TimeOrders); // Intenta generar una nueva orden cada 10 segundos
@@ -218,7 +219,7 @@ let orderInterval;
 updateOrderInterval();
 
 
-const fullLifeImage = 'Assets/heat_icon.png'; 
+const fullLifeImage = 'Assets/heat_icon.png';
 const emptyLifeImage = 'Assets/heat_icon_empty.png';
 
 let Score = 0; // Puntaje
@@ -235,23 +236,23 @@ const powerUps = [
 
 let possiblePositions;
 
-if(SelectedMap == 1 || SelectedMap == 2){
+if (SelectedMap == 1 || SelectedMap == 2) {
 
   possiblePositions = [
-  { x: 2, y: 0, z: 1.5 },
-  { x: 0, y: 0, z: -1.8 },
-  { x: -2, y: 0, z: 2 },
-  { x: 1, y: 0, z: -.5 }
+    { x: 2, y: 0, z: 1.5 },
+    { x: 0, y: 0, z: -1.8 },
+    { x: -2, y: 0, z: 2 },
+    { x: 1, y: 0, z: -.5 }
   ];
 
 }
-if(SelectedMap == 3){
+if (SelectedMap == 3) {
 
   possiblePositions = [
-  { x: 3.2, y: 0, z: 1.5 },
-  { x: -3, y: 0, z: 2.2 },
-  { x: -3.5, y: 0, z: 2 },
-  { x: 2.8, y: 0, z: 1.5 }
+    { x: 3.2, y: 0, z: 1.5 },
+    { x: -3, y: 0, z: 2.2 },
+    { x: -3.5, y: 0, z: 2 },
+    { x: 2.8, y: 0, z: 1.5 }
   ];
 
 }
@@ -415,61 +416,67 @@ $(document).ready(function () {
 
       }
 
-      if (isCollision(localPlayer, letuce2)) {
-        console.log("Colisión detectada entre el localPlayer y la lechuga2");
-        imgInventario = inventario.getLetuce();
-      }
-      if (isCollision(localPlayer, bread2)) {
-        console.log("Colisión detectada entre el localPlayer y el pan2");
-        imgInventario = inventario.getBread();
+      if (SelectedMap == 3) {
+
+        if (isCollision(localPlayer, letuce2)) {
+          console.log("Colisión detectada entre el localPlayer y la lechuga2");
+          imgInventario = inventario.getLetuce();
+        }
+        if (isCollision(localPlayer, bread2)) {
+          console.log("Colisión detectada entre el localPlayer y el pan2");
+          imgInventario = inventario.getBread();
+        }
+
+        if (isCollision(localPlayer, soda2)) {
+          console.log("Colisión detectada entre el localPlayer y la soda2");
+          imgInventario = inventario.getSoda();
+        }
+        if (isCollision(localPlayer, deliver2)) {
+          console.log("Colisión detectada entre el localPlayer y la entrega2");
+          checkDelivery(inventario);
+          imgInventario = inventario.completeOrder();
+        }
+        if (isCollision(localPlayer, trash2)) {
+          console.log("Colisión detectada entre el otherPlayer y la basura2");
+          imgInventario = inventario.trash();
+        }
+
+        //pone a cocinar la carne cruda
+        if (isCollision(localPlayer, stove2) && stoveState2 == 1 && inventario.rawmeat) {
+          console.log("Colisión detectada entre el localPlayer y la estufa2");
+          // Lógica para recoger la entrega
+          imgInventario = inventario.trash();
+          stoveState2 = 2; //cruda cocinando
+          startCronometro2(4000);
+        }
+
+        if (isCollision(localPlayer, stove2) && stoveState2 == 2) {    // && inventario.isInventoryEmpty()
+          console.log("Colisión detectada entre el localPlayer y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
+          console.log("La carne se esta cocinando, espera un momento");
+        }
+
+        if (isCollision(localPlayer, stove2) && stoveState2 == 3) {   // para recoger la carne cocida
+          console.log("Colisión detectada entre el localPlayer y la estufa con carne cocida");
+          // Lógica para recoger la entrega
+          imgInventario = inventario.getDoneMeat();
+          stoveState2 = 1; //vaciar la estufa
+          stopCronometro();
+        }
+
+        if (isCollision(localPlayer, stove2) && stoveState2 == 4 && inventario.isInventoryEmpty()) {    //para recoger la carne quemada
+          console.log("Colisión detectada entre el localPlayer y la estufa con carne quemada");
+          // Lógica para recoger la entrega
+          imgInventario = inventario.getBurnedMeat();
+          stoveState2 = 1; //vaciar la estufa
+        }
+
       }
 
-      if (isCollision(localPlayer, soda2)) {
-        console.log("Colisión detectada entre el localPlayer y la soda2");
-        imgInventario = inventario.getSoda();
-      }
-      if (isCollision(localPlayer, deliver2)) {
-        console.log("Colisión detectada entre el localPlayer y la entrega2");
-        checkDelivery(inventario);
-        imgInventario = inventario.completeOrder();
-      }
-      if (isCollision(localPlayer, trash2)) {
-        console.log("Colisión detectada entre el otherPlayer y la basura2");
-        imgInventario = inventario.trash();
-      }
 
-      //pone a cocinar la carne cruda
-      if (isCollision(localPlayer, stove2) && stoveState2 == 1 && inventario.rawmeat) {
-        console.log("Colisión detectada entre el localPlayer y la estufa2");
-        // Lógica para recoger la entrega
-        imgInventario = inventario.trash();
-        stoveState2 = 2; //cruda cocinando
-        startCronometro2(4000);
-      }
-
-      if (isCollision(localPlayer, stove2) && stoveState2 == 2) {    // && inventario.isInventoryEmpty()
-        console.log("Colisión detectada entre el localPlayer y la estufa con carne cocinando");  //si intentas quitar la carne mientras se cocina
-        console.log("La carne se esta cocinando, espera un momento");
-      }
-
-      if (isCollision(localPlayer, stove2) && stoveState2 == 3) {   // para recoger la carne cocida
-        console.log("Colisión detectada entre el localPlayer y la estufa con carne cocida");
-        // Lógica para recoger la entrega
-        imgInventario = inventario.getDoneMeat();
-        stoveState2 = 1; //vaciar la estufa
-        stopCronometro();
-      }
-
-      if (isCollision(localPlayer, stove2) && stoveState2 == 4 && inventario.isInventoryEmpty()) {    //para recoger la carne quemada
-        console.log("Colisión detectada entre el localPlayer y la estufa con carne quemada");
-        // Lógica para recoger la entrega
-        imgInventario = inventario.getBurnedMeat();
-        stoveState2 = 1; //vaciar la estufa
-      }
 
       if (powerUp && isCollision(localPlayer, powerUp) && isPowerUp) {
         console.log(`Colisión detectada entre el localPlayer y el ${powerUp.type}`);
-        
+
         if (powerUp.type === 'boots') {
           inventario.speed = 0.2;
           powerUp.RemoveFromScene(scene);
@@ -477,7 +484,7 @@ $(document).ready(function () {
             inventario.speed = 0.1;
             console.log("Speed Up terminado");
           }, 8000);
-        } 
+        }
         else if (powerUp.type === 'pan') {
           inventario.manosCalientes = true;
           powerUp.RemoveFromScene(scene);
@@ -602,7 +609,7 @@ $(document).ready(function () {
 
       if (powerUp && isCollision(otherPlayer, powerUp) && isPowerUp) {
         console.log(`Colisión detectada entre el localPlayer y el ${powerUp.type}`);
-        
+
         if (powerUp.type === 'boots') {
           inventario2.speed = 0.2;
           powerUp.RemoveFromScene(scene);
@@ -610,7 +617,7 @@ $(document).ready(function () {
             inventario2.speed = 0.1;
             console.log("Speed Up terminado");
           }, 8000);
-        } 
+        }
         else if (powerUp.type === 'pan') {
           inventario2.manosCalientes = true;
           powerUp.RemoveFromScene(scene);
@@ -718,7 +725,7 @@ $(document).ready(function () {
       togglePause();
     }
     if (e.key.toLowerCase() === '6') {
-     console.log("Ordenes actuales: ", currentOrders);
+      console.log("Ordenes actuales: ", currentOrders);
     }
     if (e.key.toLowerCase() === '9') {
       inventario2.mostrarInventario();
@@ -731,51 +738,61 @@ $(document).ready(function () {
     speed = inventario.speed;
     speed2 = inventario2.speed;
 
-    if(gameOverBool){
+    if (gameOverBool) {
       speed = 0;
       speed2 = 0;
     }
+    //para ver si sera idle o walk
+    let isMoving = false;
+    let alreadyWalking = false;
+
     // Movimiento del chef con W, A, S, D
     if (keysPressed['a'] && canMove(localPlayer, { x: -speed, z: 0 })) {
       localPlayer.PosX -= speed;
+      isMoving = true;      //chef se esta moviendo
+      alreadyWalking = true;
+      localPlayer.objeto3D.rotation.y = -Math.PI / 2;
     }
 
     if (keysPressed['d'] && canMove(localPlayer, { x: speed, z: 0 })) {
       localPlayer.PosX += speed;
       localPlayer.SetPositionThis();
+      localPlayer.objeto3D.rotation.y = Math.PI / 2;
+      isMoving = true;
+      alreadyWalking = true;
     }
 
     if (keysPressed['w'] && canMove(localPlayer, { x: 0, z: -speed })) {
       localPlayer.PosZ -= speed;
       localPlayer.SetPositionThis();
+      localPlayer.objeto3D.rotation.y = Math.PI;
+      isMoving = true;
+      alreadyWalking = true;
+
     }
 
     if (keysPressed['s'] && canMove(localPlayer, { x: 0, z: speed })) {
       localPlayer.PosZ += speed;
       localPlayer.SetPositionThis();
+      localPlayer.objeto3D.rotation.y = 0;
+      isMoving = true;
+      alreadyWalking = true;
+
     }
 
-    // // Movimiento del chef2 con las flechas
+    if (isMoving) {
+      if (!alreadyWalking) {
+        localPlayer.changeAnimationWalk();
+      }
+    }
+    else {
 
-    // if (keysPressed['arrowleft'] && canMove(chef2, { x: -speed2, z: 0 })) {
-    //   chef2.PosX -= speed2;
-    //   chef2.SetPositionThis();
-    // }
+      //localPlayer.changeAnimationIdle(); // Cambiar a animación en reposo
 
-    // if (keysPressed['arrowright'] && canMove(chef2, { x: speed2, z: 0 })) {
-    //   chef2.PosX += speed2;
-    //   chef2.SetPositionThis();
-    // }
+    }
 
-    // if (keysPressed['arrowup'] && canMove(chef2, { x: 0, z: -speed2 })) {
-    //   chef2.PosZ -= speed2;
-    //   chef2.SetPositionThis();
-    // }
+    //localPlayer.playAnimation(localPlayer.idleName);
 
-    // if (keysPressed['arrowdown'] && canMove(chef2, { x: 0, z: speed2 })) {
-    //   chef2.PosZ += speed2;
-    //   chef2.SetPositionThis();
-    // }
 
     //Mapa Navidad y Restaurante
     if (SelectedMap == 2 || SelectedMap == 1) {
@@ -787,9 +804,9 @@ $(document).ready(function () {
       stove.Update();
       bigtable2.Update();
       bigtable3.Update();
-      if(localPlayer){
-      localPlayer.Update();
-      }else{
+      if (localPlayer) {
+        localPlayer.Update();
+      } else {
         console.log("localPlayer no existe");
       }
 
@@ -803,10 +820,10 @@ $(document).ready(function () {
       stoveRaw.Update();
       stoveMeat.Update();
 
-      if(powerUp){
+      if (powerUp) {
         powerUp.Update();
       }
-      
+
       //boots.Update(); 
       //pan.Update();
 
@@ -831,10 +848,10 @@ $(document).ready(function () {
       table4.Update();
       bigtable.Update();
       bigtable3.Update();
-      console.log("Estado de localPlayer en animate:", localPlayer); 
-      if(localPlayer){
-      localPlayer.Update();
-      }else{
+      console.log("Estado de localPlayer en animate:", localPlayer);
+      if (localPlayer) {
+        localPlayer.Update();
+      } else {
         console.log("localPlayer no existe");
       }
       trash.Update();
@@ -846,7 +863,7 @@ $(document).ready(function () {
       stoveMeat2.Update();
       trash2.Update();
 
-      if(powerUp){
+      if (powerUp) {
         powerUp.Update();
       }
     }
@@ -920,17 +937,22 @@ $(document).ready(function () {
         stoveBurned2.AddToScene(scene);
       }
     }
-    if(localPlayer){
-    localPlayer.Update();
-    updateServerPosition();
-    }else{
+    if (localPlayer) {
+      localPlayer.Update();
+      updateServerPosition();
+    } else {
       console.log("localPlayer sigue sin estar creado");
     }
-    if(otherPlayer){
-    otherPlayer.Update();
-    }else{
+    if (otherPlayer) {
+      otherPlayer.Update();
+    } else {
       console.log("otherPlayer sigue sin estar creado");
     }
+
+    if (chef && chef.mixer) {
+      chef.mixer.update(0.01); // Actualizar las animaciones
+    }
+
 
     // Vuelve a llamar a la función en el siguiente cuadro    
     requestAnimationFrame(animate);
@@ -1329,7 +1351,7 @@ function MapaChristmas() {
   spotLight.castShadow = true; // Habilitar sombras (si las usas)
 
   axis = { x: 0, y: 1, z: 0 };
-  angle = Math.PI/4;
+  angle = Math.PI / 4;
 
   // boots = new CargarModelo('Models/boots/boots', manager, scene);
   // boots.SetPosition(-2, 0, 2);
@@ -1725,7 +1747,7 @@ function loseLife() {
     lives--;
     renderLives(); // Actualiza la interfaz
     console.log('Game Over');
-    gameOver(); 
+    gameOver();
   }
 }
 
@@ -1766,11 +1788,11 @@ function generateRandomPowerUp() {
 
   // Configurar un temporizador para eliminar el power-up después de 5 segundos si no es recogido
   setTimeout(() => {
-    
-      powerUp.RemoveFromScene(scene);
-      console.log('Power-up eliminado después de 5 segundos:', randomPowerUp);
-      isPowerUp = false;
-    
+
+    powerUp.RemoveFromScene(scene);
+    console.log('Power-up eliminado después de 5 segundos:', randomPowerUp);
+    isPowerUp = false;
+
   }, 5000);
 
   return powerUp;
