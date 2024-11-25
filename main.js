@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { CargarModelo } from './CargarModelo.js';
 import { Inventario } from './Inventario.js';
+import { createSimpleFire } from './getParticleSystem.js';
 
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/MTLLoader.js';
@@ -10,7 +11,6 @@ import { CargarChef } from './CargarChef.js';
 const generalVolume = localStorage.getItem('generalVolume') || '50';
 const musicVolume = localStorage.getItem('musicVolume') || '50';
 const sfxVolume = localStorage.getItem('sfxVolume') || '50';
-
 
 const successSound = new Audio('Assets/correct.mp3');
 const failureSound = new Audio('Assets/incorrect.mp3');
@@ -923,6 +923,9 @@ $(document).ready(function () {
 
     // Cambiar el estado de la ESTUFA 1 ------
     if (stoveState == 1) {  //vacio
+      
+      
+
       stoveBurned.RemoveFromScene(scene);
       stoveRaw.RemoveFromScene(scene);
       stoveMeat.RemoveFromScene(scene);
@@ -931,6 +934,8 @@ $(document).ready(function () {
     }
     if (stoveState == 2) {  //crudo
       //quita los otros modelos que no se veran
+      
+
       stoveBurned.RemoveFromScene(scene);
       stoveMeat.RemoveFromScene(scene);
       stove.RemoveFromScene(scene);
@@ -939,6 +944,9 @@ $(document).ready(function () {
 
     }
     if (stoveState == 3) { //cocido
+ 
+      
+
       stoveRaw.RemoveFromScene(scene);
       stoveBurned.RemoveFromScene(scene);
       stove.RemoveFromScene(scene);
@@ -952,10 +960,17 @@ $(document).ready(function () {
       stoveMeat.RemoveFromScene(scene);
 
       stoveBurned.AddToScene(scene);
+      const fireEffect = createSimpleFire(scene, stoveBurned.objeto3D.position);
+      stoveBurned.particleEffect = fireEffect; 
+      
+
     }
 
     if (SelectedMap == 3) {   // Cambiar el estado de la ESTUFA 2 ------
       if (stoveState2 == 1) {  //vacio
+
+        
+
         stoveBurned2.RemoveFromScene(scene);
         stoveRaw2.RemoveFromScene(scene);
         stoveMeat2.RemoveFromScene(scene);
@@ -966,6 +981,10 @@ $(document).ready(function () {
 
       if (stoveState2 == 2) {  //crudo
         //quita los otros modelos que no se veran
+
+        
+        
+
         stoveBurned2.RemoveFromScene(scene);
         stoveMeat2.RemoveFromScene(scene);
         stove2.RemoveFromScene(scene);
@@ -975,6 +994,7 @@ $(document).ready(function () {
       }
 
       if (stoveState2 == 3) { //cocido
+
         stoveRaw2.RemoveFromScene(scene);
         stoveBurned2.RemoveFromScene(scene);
         stove2.RemoveFromScene(scene);
@@ -988,7 +1008,14 @@ $(document).ready(function () {
         stoveMeat2.RemoveFromScene(scene);
 
         stoveBurned2.AddToScene(scene);
+
+        const fireEffect = createSimpleFire(scene, stoveBurned2.objeto3D.position);
+        stoveBurned2.particleEffect = fireEffect; 
+      
+        
+
       }
+      
     }
     if (localPlayer) {
       localPlayer.Update();
@@ -1005,7 +1032,6 @@ $(document).ready(function () {
     if (chef && chef.mixer) {
       chef.mixer.update(0.01); // Actualizar las animaciones
     }
-
 
     // Vuelve a llamar a la función en el siguiente cuadro    
     requestAnimationFrame(animate);

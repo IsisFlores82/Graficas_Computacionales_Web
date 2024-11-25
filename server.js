@@ -21,6 +21,7 @@ app.use('/dishdashAPI', express.static(join(__dirname, 'dishdashAPI')));
 app.use('/CargarModelo.js', express.static(join(__dirname, 'CargarModelo.js')));
 app.use('/CargarChef.js', express.static(join(__dirname, 'CargarChef.js')));
 app.use('/Inventario.js', express.static(join(__dirname, 'Inventario.js')));
+app.use('/getParticleSystem.js', express.static(join(__dirname, 'getParticleSystem.js')));
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, '/Frontend/Index.html'));
 });
