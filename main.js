@@ -40,7 +40,8 @@ function setAudioVolumes() {
   newOrderSound.volume = generalVolume * sfxVolume;
   powerUpSound.volume = generalVolume * sfxVolume;
   fireSound.volume = generalVolume * sfxVolume;
-
+  lose.volume = generalVolume * sfxVolume;
+  Victory.volume = generalVolume * sfxVolume;
 }
 
 // Aplicar volúmenes iniciales
