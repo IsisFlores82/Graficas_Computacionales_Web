@@ -20,6 +20,9 @@ const map1Audio = new Audio('Assets/Mad_Rush.mp3');
 const map2Audio = new Audio('Assets/Kitchen_Chaos_3.mp3');
 const map3Audio = new Audio('Assets/Grass_Skirt.mp3');
 const fireSound = new Audio('Assets/fire.mp3');
+const lose = new Audio('Assets/lose.mp3');
+const Victory = new Audio('Assets/Victory.mp3');
+
 
 function setAudioVolumes() {
   const generalVolume = localStorage.getItem('generalVolume') / 100;
@@ -152,6 +155,15 @@ socket.on('updatePlayerLives', (data) => {
 socket.on('FinDeJuego', (data) => {
   console.log(`[DEBUG] Fin del juego: ${data.resultado}`);
   alert(`Fin del juego: ${data.resultado}`);
+  if(data.resultado=== 'Empate'){
+    lose.play(); 
+  }
+  else if(data.resultado === 'Todos perdieron'){
+    lose.play();
+  }
+  else{
+   Victory.play();
+  }
   gameOver();
 });
 
@@ -246,6 +258,11 @@ let currentOrders = [];
 let currentOrders2 = [];
 
 let maxOrders = 11;
+
+// DESCOMENTAR SI SE HARA LO DE Q EN EL PVP SEAN MENOS ORDERENES !!
+// if(SelectedMap == 3){
+//   maxOrders = 6;
+// }
 
 let TimeOrders = 10000;
 
